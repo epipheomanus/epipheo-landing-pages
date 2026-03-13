@@ -10,13 +10,36 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Security headers
+  app.use((_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    next();
+  });
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
       : path.resolve(__dirname, "..", "dist", "public");
 
-  app.use(express.static(staticPath));
+  // Static assets with long cache (hashed filenames)
+  app.use(
+    "/assets",
+    express.static(path.join(staticPath, "assets"), {
+      maxAge: "1y",
+      immutable: true,
+    })
+  );
+
+  // Other static files with shorter cache
+  app.use(
+    express.static(staticPath, {
+      maxAge: "1h",
+    })
+  );
 
   // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {
@@ -26,7 +49,7 @@ async function startServer() {
   const port = process.env.PORT || 3000;
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Epipheo Quokka Landing — running on http://localhost:${port}/`);
   });
 }
 
