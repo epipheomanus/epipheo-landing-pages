@@ -93,6 +93,7 @@ html {
   body {
     @apply bg-background text-foreground;
     background: #000;
+    font-family: 'Noticia Text', Georgia, serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -215,7 +216,7 @@ html {
 
   /* ─── HubSpot Form Styling ─────────────────────────────── */
   .hs-form-container .hs-form {
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Noticia Text', Georgia, serif !important;
   }
   .hs-form-container .hs-form fieldset {
     max-width: 100% !important;
@@ -227,7 +228,7 @@ html {
     border-radius: 8px !important;
     color: #fff !important;
     padding: 12px 16px !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Noticia Text', Georgia, serif !important;
     font-size: 14px !important;
     transition: border-color 0.2s ease !important;
   }
@@ -245,7 +246,7 @@ html {
   }
   .hs-form-container .hs-form label {
     color: rgba(255,255,255,0.6) !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Noticia Text', Georgia, serif !important;
     font-size: 13px !important;
     font-weight: 500 !important;
     margin-bottom: 4px !important;
@@ -289,7 +290,7 @@ html {
   }
   .hs-form-container .submitted-message {
     color: var(--cyan) !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Noticia Text', Georgia, serif !important;
     font-size: 16px !important;
     text-align: center !important;
     padding: 24px !important;

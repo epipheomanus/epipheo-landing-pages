@@ -4,7 +4,7 @@
  * Design: Cinematic Noir Editorial
  * Pure black base (#000), cyan accent (#00E5CC), orange-red (#FF5F3C)
  * Barlow Condensed ExtraBold ALL CAPS headlines
- * DM Sans body, Space Mono labels
+ * Noticia Text body, Space Mono labels
  * Full-bleed sections, pill CTAs, editorial asymmetry
  *
  * NARRATIVE: "Imagine what YOU could do." Every section addresses the reader.
@@ -100,7 +100,7 @@ function Nav() {
         <div className="flex items-center gap-3">
           <span
             className="hidden md:block text-xs uppercase tracking-widest font-medium"
-            style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}
+            style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}
           >
             Case Study
           </span>
@@ -140,7 +140,7 @@ function Hero() {
           </h1>
           <p
             className="text-lg mb-8 max-w-xl leading-relaxed"
-            style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.7)" }}
+            style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.7)" }}
           >
             We built an original animated series from scratch, got it distributed on Angel Studios, and started generating revenue in 12 months. Here's the exact playbook — and how it could work for you.
           </p>
@@ -160,7 +160,7 @@ function CharacterShowcase() {
     <section style={{ background: "#050505", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
       <div className="container py-12">
         <FadeInUp>
-          <p className="text-sm text-center mb-2" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}>
+          <p className="text-sm text-center mb-2" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}>
             These characters didn't exist 12 months ago.
           </p>
           <p className="section-label text-center mb-8">Now they're streaming on Angel Studios.</p>
@@ -235,7 +235,7 @@ function WatchBanner() {
           <div>
             <p
               className="text-xs uppercase tracking-widest mb-1"
-              style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}
+              style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}
             >
               Watch the show that proves it works
             </p>
@@ -244,7 +244,7 @@ function WatchBanner() {
             </p>
             <p
               className="text-sm flex items-center gap-2"
-              style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}
+              style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}
             >
               angel.com/watch/quokkas-wild-life
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
@@ -267,7 +267,7 @@ function StatsBar() {
         <FadeInUp>
           <p
             className="text-sm text-center mb-10"
-            style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}
+            style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}
           >
             This is what the timeline looks like when you have the right partner and the right platform.
           </p>
@@ -285,7 +285,7 @@ function StatsBar() {
               </div>
               <p
                 className="text-xs uppercase tracking-widest"
-                style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}
+                style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}
               >
                 {label}
               </p>
@@ -308,7 +308,7 @@ function Proof() {
             There's a Clear Path.<br />
             <span style={{ color: "var(--cyan)" }}>We've Already Walked It.</span>
           </h2>
-          <p className="text-lg leading-relaxed" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>
+          <p className="text-lg leading-relaxed" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>
             Getting an original animated series from idea to distribution used to require years, millions of dollars, and a lot of luck. That's no longer true. Here's the exact process we used — and that you can use too.
           </p>
         </FadeInUp>
@@ -361,7 +361,7 @@ function Proof() {
                   {step}
                 </span>
                 <h3 className="epipheo-headline text-white mb-2" style={{ fontSize: "clamp(1.4rem, 2.5vw, 2rem)" }}>{title}</h3>
-                <p className="leading-relaxed" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>{body}</p>
+                <p className="leading-relaxed" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>{body}</p>
               </div>
             </FadeInUp>
           ))}
@@ -392,7 +392,7 @@ function AngelSection() {
               The Distribution Problem<br />
               <span style={{ color: "var(--cyan)" }}>Is Already Solved.</span>
             </h2>
-            <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>
+            <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>
               The hardest part of launching a show has always been getting distribution. Angel Studios has fundamentally changed that — and it's open to you right now.
             </p>
           </FadeInUp>
@@ -419,7 +419,7 @@ function AngelSection() {
 
           {/* Process Flow */}
           <FadeInUp>
-            <p className="text-sm text-center mb-8" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-sm text-center mb-8" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}>
               Your path from idea to distribution:
             </p>
           </FadeInUp>
@@ -435,7 +435,7 @@ function AngelSection() {
                 <div className="flex flex-col items-center text-center p-4 flex-1">
                   <div className="text-3xl mb-3">{icon}</div>
                   <div className="text-white font-bold text-sm mb-1" style={{ fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: "0.05em" }}>{label}</div>
-                  <div className="text-xs" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}>{desc}</div>
+                  <div className="text-xs" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}>{desc}</div>
                 </div>
                 {i < 4 && (
                   <div className="hidden md:flex items-center flex-shrink-0 px-1">
@@ -453,7 +453,7 @@ function AngelSection() {
             <p className="epipheo-headline text-white mb-3" style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)" }}>
               "We didn't have a special deal with Angel Studios.<br className="hidden md:block" /> We used the same process that's available to anyone."
             </p>
-            <p className="text-sm" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}>— Epipheo, on the Angel Studios Guild process</p>
+            <p className="text-sm" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}>— Epipheo, on the Angel Studios Guild process</p>
           </FadeInUp>
         </div>
       </div>
@@ -477,7 +477,7 @@ function WhatWeBring() {
             You Bring the Idea.<br />
             <span style={{ color: "var(--cyan)" }}>We Bring Everything Else.</span>
           </h2>
-          <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>
+          <p className="text-lg leading-relaxed max-w-2xl mx-auto" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>
             15 years of animation production for the world's biggest brands — now available for your original IP. You don't need a studio. You don't need a network. You need a partner who's already done this.
           </p>
         </FadeInUp>
@@ -508,7 +508,7 @@ function WhatWeBring() {
             >
               <div className="mb-4" style={{ color: "var(--cyan)", fontSize: "1.2rem" }}>{icon}</div>
               <h3 className="epipheo-headline text-white mb-3" style={{ fontSize: "1.5rem" }}>{title}</h3>
-              <p className="text-sm leading-relaxed" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}>{body}</p>
+              <p className="text-sm leading-relaxed" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}>{body}</p>
             </FadeInUp>
           ))}
         </div>
@@ -533,7 +533,7 @@ function WhoThisIsFor() {
                   You Have a Story.<br />
                   <span style={{ color: "var(--cyan)" }}>We Have the Path.</span>
                 </h2>
-                <p className="leading-relaxed mb-8" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>
+                <p className="leading-relaxed mb-8" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>
                   This works for brands, creators, and entrepreneurs who have an idea worth animating — and who want a proven partner to take it from concept to a streaming series that generates real revenue.
                 </p>
               </FadeInUp>
@@ -559,7 +559,7 @@ function WhoThisIsFor() {
                     style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
                   >
                     <p className="text-white font-semibold text-sm mb-1" style={{ fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: "0.05em", fontSize: "1rem" }}>{who}</p>
-                    <p className="text-sm leading-relaxed" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.5)" }}>{what}</p>
+                    <p className="text-sm leading-relaxed" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.5)" }}>{what}</p>
                   </FadeInUp>
                 ))}
               </div>
@@ -597,11 +597,11 @@ function WhoThisIsFor() {
                     >
                       {label}
                     </p>
-                    <p className="text-xs" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.35)" }}>{note}</p>
+                    <p className="text-xs" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.35)" }}>{note}</p>
                   </div>
                 </div>
               ))}
-              <p className="text-xs mt-2 italic" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.25)" }}>
+              <p className="text-xs mt-2 italic" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.25)" }}>
                 We did this in 12 months. So can you.
               </p>
             </FadeInUp>
@@ -659,7 +659,7 @@ function CTA() {
             <span style={{ color: "var(--cyan)" }}>Your Show</span><br />
             Look Like?
           </h2>
-          <p className="text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.6)" }}>
+          <p className="text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.6)" }}>
             We built Quokka's Wild Life to prove this was possible. Now we want to do it with you. Let's talk about your idea — no pitch deck required.
           </p>
         </FadeInUp>
@@ -683,7 +683,7 @@ function CTA() {
           >
             Watch the Show First
           </a>
-          <p className="text-sm mt-4" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.3)" }}>
+          <p className="text-sm mt-4" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.3)" }}>
             Or just watch the show. That's the best pitch we have.
           </p>
         </FadeInUp>
@@ -711,7 +711,7 @@ function Footer() {
             }}
           />
         </a>
-        <p className="text-xs" style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.3)" }}>
+        <p className="text-xs" style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.3)" }}>
           &copy; {new Date().getFullYear()} Epipheo. All rights reserved.
         </p>
         <a
@@ -719,7 +719,7 @@ function Footer() {
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs hover:opacity-100 transition-colors"
-          style={{ fontFamily: "'DM Sans',sans-serif", color: "rgba(255,255,255,0.4)" }}
+          style={{ fontFamily: "'Noticia Text',Georgia,serif", color: "rgba(255,255,255,0.4)" }}
         >
           Watch on Angel Studios →
         </a>
