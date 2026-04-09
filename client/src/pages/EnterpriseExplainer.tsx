@@ -13,7 +13,11 @@ const PORTFOLIO_VIDEOS = [
 
 /* ─── Client Logos ────────────────────────────────────────────────────────── */
 const CLIENT_LOGOS = [
-  "OKTA", "SPLUNK", "DELOITTE", "IRACING", "CLEO", "POET"
+  { name: "SPLUNK", src: "/logos/splunk-logo.svg" },
+  { name: "OKTA", src: "/logos/okta-logo.svg" },
+  { name: "BACKBLAZE", src: "/logos/backblaze.svg" },
+  { name: "EARLY WARNING", src: "/logos/epipheo-orange.svg" },
+  { name: "DEEPSEAS", src: "/logos/epipheo-orange.svg" },
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -188,7 +192,7 @@ export default function EnterpriseExplainer() {
   return (
     <div className="min-h-screen bg-[#1A1A1A] text-white" style={{ fontFamily: "'Barlow', sans-serif" }}>
 
-      {/* ── NAV ─────────────────────────────────────────────────────────── */}
+      {/* ── NAV (Minimal: Logo + CTA only) ─────────────────────────────── */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled ? "bg-[#111111]/95 backdrop-blur-md py-4" : "bg-[#1A1A1A]/80 backdrop-blur-sm py-6"
@@ -203,55 +207,9 @@ export default function EnterpriseExplainer() {
               style={{ filter: "brightness(0) invert(1)" }}
             />
           </a>
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="https://epipheo.com/portfolio/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Portfolio
-            </a>
-            <a
-              href="https://epipheo.com/services/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Services
-            </a>
-            <a
-              href="https://epipheo.com/industries/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Industries
-            </a>
-            <a
-              href="https://epipheo.com/resources/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Resources
-            </a>
-            <button
-              onClick={() => scrollToId("get-a-quote")}
-              className="bg-[#FF5F3C] text-white px-6 py-2.5 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all text-[13px]"
-              style={{ fontFamily: "'Oswald', sans-serif" }}
-            >
-              Get a Quote
-            </button>
-          </div>
-          {/* Mobile CTA */}
           <button
             onClick={() => scrollToId("get-a-quote")}
-            className="md:hidden bg-[#FF5F3C] text-white px-4 py-2 rounded-full font-bold text-xs tracking-widest uppercase"
+            className="bg-[#FF5F3C] text-white px-6 py-2.5 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all text-[13px]"
             style={{ fontFamily: "'Oswald', sans-serif" }}
           >
             Get a Quote
@@ -261,8 +219,8 @@ export default function EnterpriseExplainer() {
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
       <section className="relative pt-40 pb-32 px-8 overflow-hidden bg-[#1A1A1A]">
-        <div className="container mx-auto flex flex-col lg:flex-row items-center gap-16">
-          <div className="lg:w-1/2">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto text-center mb-16">
             <FadeIn>
               <h1
                 className="text-5xl md:text-7xl font-bold leading-[1.05] mb-8 uppercase"
@@ -272,46 +230,32 @@ export default function EnterpriseExplainer() {
                 Deserve Clear<br />
                 Explanations
               </h1>
-              <p className="text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">
+              <p className="text-xl text-gray-400 mb-10 leading-relaxed">
                 We explain the complex so your buyers can confidently say yes. Premium animated explainer videos for enterprise B2B solutions.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap justify-center gap-4">
                 <button
-                  onClick={() => scrollToId("get-a-quote")}
+                  onClick={() => scrollToId("our-work")}
                   className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
-                  Get Your Custom Quote
+                  See Our Work
                 </button>
                 <button
-                  onClick={() => scrollToId("portfolio")}
+                  onClick={() => scrollToId("get-a-quote")}
                   className="border-2 border-white text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
-                  Watch Our Reel
+                  Get a Custom Quote
                 </button>
               </div>
             </FadeIn>
           </div>
-          <div className="lg:w-1/2 w-full">
-            <FadeIn delay={0.2}>
-              <div className="aspect-video bg-black/40 rounded-lg border border-white/10 flex items-center justify-center relative group cursor-pointer">
-                <div className="w-20 h-20 bg-[#FF5F3C] rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
-                  <div
-                    className="w-0 h-0 ml-2"
-                    style={{
-                      borderTop: "12px solid transparent",
-                      borderBottom: "12px solid transparent",
-                      borderLeft: "20px solid white",
-                    }}
-                  />
-                </div>
-                <div className="absolute bottom-4 left-4 text-[10px] text-white/20 font-mono uppercase tracking-widest">
-                  [ Background Video Placeholder ]
-                </div>
-              </div>
-            </FadeIn>
-          </div>
+
+          {/* Hero Wistia Video */}
+          <FadeIn delay={0.2} className="max-w-4xl mx-auto">
+            <WistiaVideo id="l8418oscmu" />
+          </FadeIn>
         </div>
       </section>
 
@@ -324,18 +268,21 @@ export default function EnterpriseExplainer() {
           >
             Trusted by the World's Most Iconic Brands
           </h2>
-          <div className="flex flex-wrap justify-center items-center gap-6 mb-20">
-            {CLIENT_LOGOS.map((name) => (
+          <div className="flex flex-wrap justify-center items-center gap-8 mb-20">
+            {CLIENT_LOGOS.map((logo) => (
               <div
-                key={name}
-                className="bg-white px-10 py-5 rounded shadow-sm flex items-center justify-center min-w-[140px]"
+                key={logo.name}
+                className="bg-white px-8 py-6 rounded shadow-sm flex items-center justify-center min-w-[120px] h-20"
               >
-                <span
-                  className="font-bold tracking-widest text-gray-300"
-                  style={{ fontFamily: "'Oswald', sans-serif" }}
-                >
-                  {name}
-                </span>
+                <img
+                  src={logo.src}
+                  alt={logo.name}
+                  style={{
+                    maxHeight: "40px",
+                    maxWidth: "100%",
+                    filter: "grayscale(100%) brightness(2)",
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -482,7 +429,7 @@ export default function EnterpriseExplainer() {
       </section>
 
       {/* ── PORTFOLIO ──────────────────────────────────────────────────── */}
-      <section id="portfolio" className="bg-white py-32 px-8 text-[#1A1A1A]">
+      <section id="our-work" className="bg-white py-32 px-8 text-[#1A1A1A]">
         <div className="container mx-auto">
           <FadeIn>
             <div className="text-center mb-20">
