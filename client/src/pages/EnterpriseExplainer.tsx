@@ -1,36 +1,23 @@
 import { useEffect, useState } from "react";
 import { useInView } from "@/hooks/useInView";
 
-/* ─── Constants ───────────────────────────────────────────────────────────── */
-const ACCENT = "#FF5F3C";
-const DARK = "#1A1A1A";
-const DARK_DEEPER = "#111111";
-const WHITE = "#FFFFFF";
-const GRAY_TEXT = "#A0A0A0";
-const LIGHT_BG = "#F0F0F0";
-
-const LOGO_WHITE = "/logos/epipheo-white.svg";
-
-const CLIENT_LOGOS = [
-  { name: "OKTA", src: "/logos/okta.png" },
-  { name: "SPLUNK", src: "/logos/splunk.png" },
-  { name: "DELOITTE", src: "/logos/deloitte.png" },
-  { name: "IRACING", src: "/logos/iracing.png" },
-  { name: "CLEO", src: "/logos/cleo.png" },
-  { name: "POET", src: "/logos/poet.png" },
+/* ─── Portfolio Videos ────────────────────────────────────────────────────── */
+const PORTFOLIO_VIDEOS = [
+  { id: "kc6uuxxwkz", client: "SPLUNK", title: "App Building" },
+  { id: "4yygbynwqj", client: "DEEPSEAS", title: "Overview" },
+  { id: "yqpykglhv0", client: "BACKBLAZE", title: "B2B Brand Explainer" },
+  { id: "n3q5yhztjo", client: "OKTA", title: "Highly Regulated Identity" },
+  { id: "tv6edcxd5i", client: "EARLY WARNING", title: "Check Fraud" },
+  { id: "jxxmiu2fs1", client: "NATIONAL CRYPTOCURRENCY ASSOCIATION", title: "Crypto Safety" },
 ];
 
-const PORTFOLIO_VIDEOS = [
-  { id: "n3q5yhztjo", title: "PASSKEYS EXPLAINER", client: "OKTA" },
-  { id: "kc6uuxxwkz", title: "OBSERVABILITY PLATFORM", client: "SPLUNK" },
-  { id: "deloitte-placeholder", title: "CONVERGEHEALTH", client: "DELOITTE" },
-  { id: "iracing-placeholder", title: "FLAGSHIP EXPERIENCE", client: "IRACING" },
-  { id: "poet-placeholder", title: "FACILITY PROCESS", client: "POET" },
-  { id: "cleo-placeholder", title: "PLATFORM EXPLAINER", client: "CLEO" },
+/* ─── Client Logos ────────────────────────────────────────────────────────── */
+const CLIENT_LOGOS = [
+  "OKTA", "SPLUNK", "DELOITTE", "IRACING", "CLEO", "POET"
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
-function scrollTo(id: string) {
+function scrollToId(id: string) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth" });
 }
@@ -52,7 +39,7 @@ function FadeIn({
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(20px)",
-        transition: `opacity 0.8s ease ${delay}s, transform 0.8s ease ${delay}s`,
+        transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
       }}
     >
       {children}
@@ -60,84 +47,247 @@ function FadeIn({
   );
 }
 
-/* ─── Components ──────────────────────────────────────────────────────────── */
-
-function HubSpotForm() {
+/* ─── Wistia Video Component ──────────────────────────────────────────────── */
+function WistiaVideo({ id }: { id: string }) {
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "//js.hsforms.net/forms/embed/v2.js";
-    script.charset = "utf-8";
-    script.type = "text/javascript";
-    script.onload = () => {
-      if ((window as any).hbspt) {
-        (window as any).hbspt.forms.create({
-          region: "na1",
-          portalId: "20864859",
-          formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
-          target: "#hs-form-target"
-        });
-      }
-    };
-    document.body.appendChild(script);
-  }, []);
+    // Load Wistia scripts once per video
+    const jsonpSrc = `https://fast.wistia.com/embed/medias/${id}.jsonp`;
+    if (!document.querySelector(`script[src="${jsonpSrc}"]`)) {
+      const s1 = document.createElement("script");
+      s1.src = jsonpSrc;
+      s1.async = true;
+      document.head.appendChild(s1);
+    }
+    const evSrc = "https://fast.wistia.com/assets/external/E-v1.js";
+    if (!document.querySelector(`script[src="${evSrc}"]`)) {
+      const s2 = document.createElement("script");
+      s2.src = evSrc;
+      s2.async = true;
+      document.head.appendChild(s2);
+    }
+  }, [id]);
 
-  return <div id="hs-form-target" className="hs-form-container" />;
+  return (
+    <div style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+      <div
+        style={{
+          height: "100%",
+          left: 0,
+          position: "absolute",
+          top: 0,
+          width: "100%",
+        }}
+      >
+        <div
+          className={`wistia_embed wistia_async_${id} seo=true videoFoam=true`}
+          style={{ height: "100%", position: "relative", width: "100%" }}
+        >
+          &nbsp;
+        </div>
+      </div>
+    </div>
+  );
 }
 
+/* ─── HubSpot Form + Budget Dropdown ─────────────────────────────────────── */
+function QuoteForm() {
+  useEffect(() => {
+    const src = "//js.hsforms.net/forms/embed/v2.js";
+    if (!document.querySelector(`script[src="${src}"]`)) {
+      const script = document.createElement("script");
+      script.src = src;
+      script.charset = "utf-8";
+      script.type = "text/javascript";
+      script.onload = () => {
+        if ((window as any).hbspt) {
+          (window as any).hbspt.forms.create({
+            region: "na1",
+            portalId: "20864859",
+            formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
+            target: "#hs-form-target",
+          });
+        }
+      };
+      document.body.appendChild(script);
+    } else if ((window as any).hbspt) {
+      (window as any).hbspt.forms.create({
+        region: "na1",
+        portalId: "20864859",
+        formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
+        target: "#hs-form-target",
+      });
+    }
+  }, []);
+
+  return (
+    <div>
+      {/* Standalone budget dropdown — not part of HubSpot form */}
+      <div style={{ marginBottom: "20px" }}>
+        <label
+          htmlFor="budget-range"
+          style={{
+            display: "block",
+            marginBottom: "8px",
+            fontFamily: "'Oswald', sans-serif",
+            fontWeight: 700,
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.1em",
+            fontSize: "13px",
+            color: "#1A1A1A",
+          }}
+        >
+          Estimated Budget
+        </label>
+        <select
+          id="budget-range"
+          style={{
+            width: "100%",
+            padding: "12px 16px",
+            border: "1px solid #E0E0E0",
+            borderRadius: "4px",
+            background: "#F9F9F9",
+            color: "#1A1A1A",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "16px",
+            appearance: "auto" as const,
+          }}
+        >
+          <option value="">Select a range...</option>
+          <option value="under-10k">Under $10,000</option>
+          <option value="10k-25k">$10,000 – $25,000</option>
+          <option value="25k-50k">$25,000 – $50,000</option>
+          <option value="50k-100k">$50,000 – $100,000</option>
+          <option value="100k-plus">$100,000+</option>
+        </select>
+      </div>
+
+      {/* HubSpot form */}
+      <div id="hs-form-target" className="hs-form-container" />
+    </div>
+  );
+}
+
+/* ─── Page ────────────────────────────────────────────────────────────────── */
 export default function EnterpriseExplainer() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    document.title = "Enterprise Explainer Videos | Epipheo";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) {
+      meta.setAttribute(
+        "content",
+        "Epipheo crafts premium animated explainer videos for enterprise B2B brands. Turn complex solutions into clear, compelling stories that drive decisions."
+      );
+    }
     const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
-    document.title = "Enterprise Explainer Videos | Epipheo";
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-white font-['Barlow']">
+    <div className="min-h-screen bg-[#1A1A1A] text-white" style={{ fontFamily: "'Barlow', sans-serif" }}>
+
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#111111]/95 backdrop-blur-md py-4' : 'bg-transparent py-6'}`}>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "bg-[#111111]/95 backdrop-blur-md py-4" : "bg-[#1A1A1A]/80 backdrop-blur-sm py-6"
+        }`}
+      >
         <div className="container mx-auto px-8 flex items-center justify-between">
           <a href="https://epipheo.com" target="_blank" rel="noopener noreferrer">
-            <img src={LOGO_WHITE} alt="Epipheo" className="h-8" />
+            <img
+              src="/logos/epipheo-white-cropped.png"
+              alt="Epipheo"
+              className="h-8 w-auto"
+              style={{ filter: "brightness(0) invert(1)" }}
+            />
           </a>
-          <div className="hidden md:flex items-center gap-8 text-[13px] font-bold tracking-widest uppercase font-['Oswald']">
-            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Portfolio</a>
-            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Services</a>
-            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Industries</a>
-            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Resources</a>
-            <button 
-              onClick={() => scrollTo('quote')}
-              className="bg-[#FF5F3C] text-white px-6 py-2.5 rounded-full hover:bg-[#ff7a5c] transition-all transform hover:-translateY-0.5"
+          <div className="hidden md:flex items-center gap-8">
+            <a
+              href="https://epipheo.com/portfolio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              Portfolio
+            </a>
+            <a
+              href="https://epipheo.com/services/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              Services
+            </a>
+            <a
+              href="https://epipheo.com/industries/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              Industries
+            </a>
+            <a
+              href="https://epipheo.com/resources/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[13px] font-bold tracking-widest uppercase hover:text-[#FF5F3C] transition-colors"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              Resources
+            </a>
+            <button
+              onClick={() => scrollToId("get-a-quote")}
+              className="bg-[#FF5F3C] text-white px-6 py-2.5 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all text-[13px]"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
             >
               Get a Quote
             </button>
           </div>
+          {/* Mobile CTA */}
+          <button
+            onClick={() => scrollToId("get-a-quote")}
+            className="md:hidden bg-[#FF5F3C] text-white px-4 py-2 rounded-full font-bold text-xs tracking-widest uppercase"
+            style={{ fontFamily: "'Oswald', sans-serif" }}
+          >
+            Get a Quote
+          </button>
         </div>
       </nav>
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section className="relative pt-40 pb-32 px-8 overflow-hidden">
+      <section className="relative pt-40 pb-32 px-8 overflow-hidden bg-[#1A1A1A]">
         <div className="container mx-auto flex flex-col lg:flex-row items-center gap-16">
           <div className="lg:w-1/2">
             <FadeIn>
-              <h1 className="text-5xl md:text-7xl font-bold font-['Oswald'] leading-[1.1] mb-8 uppercase">
+              <h1
+                className="text-5xl md:text-7xl font-bold leading-[1.05] mb-8 uppercase"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
                 Complex Solutions<br />
-                Deserve <span className="text-white">Clear</span><br />
+                Deserve Clear<br />
                 Explanations
               </h1>
               <p className="text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">
                 We explain the complex so your buyers can confidently say yes. Premium animated explainer videos for enterprise B2B solutions.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button 
-                  onClick={() => scrollTo('quote')}
-                  className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold font-['Oswald'] tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
+                <button
+                  onClick={() => scrollToId("get-a-quote")}
+                  className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
                   Get Your Custom Quote
                 </button>
-                <button className="border-2 border-white text-white px-10 py-4 rounded-full font-bold font-['Oswald'] tracking-widest uppercase hover:bg-white hover:text-black transition-all">
+                <button
+                  onClick={() => scrollToId("portfolio")}
+                  className="border-2 border-white text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
                   Watch Our Reel
                 </button>
               </div>
@@ -147,7 +297,14 @@ export default function EnterpriseExplainer() {
             <FadeIn delay={0.2}>
               <div className="aspect-video bg-black/40 rounded-lg border border-white/10 flex items-center justify-center relative group cursor-pointer">
                 <div className="w-20 h-20 bg-[#FF5F3C] rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
-                  <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-white border-b-[12px] border-b-transparent ml-2" />
+                  <div
+                    className="w-0 h-0 ml-2"
+                    style={{
+                      borderTop: "12px solid transparent",
+                      borderBottom: "12px solid transparent",
+                      borderLeft: "20px solid white",
+                    }}
+                  />
                 </div>
                 <div className="absolute bottom-4 left-4 text-[10px] text-white/20 font-mono uppercase tracking-widest">
                   [ Background Video Placeholder ]
@@ -161,29 +318,48 @@ export default function EnterpriseExplainer() {
       {/* ── SOCIAL PROOF ────────────────────────────────────────────────── */}
       <section className="bg-[#F0F0F0] py-20 px-8 text-[#1A1A1A]">
         <div className="container mx-auto text-center">
-          <h2 className="text-2xl font-bold font-['Oswald'] tracking-widest uppercase mb-12">
+          <h2
+            className="text-2xl font-bold tracking-widest uppercase mb-14"
+            style={{ fontFamily: "'Oswald', sans-serif" }}
+          >
             Trusted by the World's Most Iconic Brands
           </h2>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 mb-20">
-            {CLIENT_LOGOS.map((logo) => (
-              <div key={logo.name} className="bg-white px-8 py-4 rounded shadow-sm flex items-center justify-center min-w-[140px]">
-                <span className="font-bold font-['Oswald'] text-gray-300 tracking-widest">{logo.name}</span>
+          <div className="flex flex-wrap justify-center items-center gap-6 mb-20">
+            {CLIENT_LOGOS.map((name) => (
+              <div
+                key={name}
+                className="bg-white px-10 py-5 rounded shadow-sm flex items-center justify-center min-w-[140px]"
+              >
+                <span
+                  className="font-bold tracking-widest text-gray-300"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  {name}
+                </span>
               </div>
             ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
-            <div>
-              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">6,000+</div>
-              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Videos Delivered</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">15+</div>
-              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Years Experience</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">50+</div>
-              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Fortune 500 Clients</div>
-            </div>
+            {[
+              { num: "6,000+", label: "Videos Delivered" },
+              { num: "15+", label: "Years Experience" },
+              { num: "50+", label: "Fortune 500 Clients" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <div
+                  className="text-5xl font-bold text-[#FF5F3C] mb-2"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  {stat.num}
+                </div>
+                <div
+                  className="text-sm font-bold tracking-widest uppercase text-[#1A1A1A]"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -192,8 +368,16 @@ export default function EnterpriseExplainer() {
       <section className="bg-white py-32 px-8 text-[#1A1A1A]">
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24">
           <FadeIn>
-            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6">The Problem</div>
-            <h2 className="text-4xl md:text-5xl font-bold font-['Oswald'] leading-tight uppercase mb-8">
+            <div
+              className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              The Problem
+            </div>
+            <h2
+              className="text-4xl md:text-5xl font-bold leading-tight uppercase mb-8"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
               Your Product is Powerful. But if prospects don't understand it, they won't buy it.
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
@@ -201,16 +385,31 @@ export default function EnterpriseExplainer() {
             </p>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6">The Solution</div>
-            <h2 className="text-4xl md:text-5xl font-bold font-['Oswald'] leading-tight uppercase mb-8">
+            <div
+              className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              The Solution
+            </div>
+            <h2
+              className="text-4xl md:text-5xl font-bold leading-tight uppercase mb-8"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
               We explain the complex so your buyers can confidently say yes.
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-10">
               Epipheo crafts strategic storytelling that turns complexity into clarity for decision-makers.
             </p>
             <div className="bg-[#F0F0F0] p-8 border-l-4 border-[#FF5F3C]">
-              <h4 className="font-bold font-['Oswald'] uppercase tracking-widest mb-2">The Epipheo Difference</h4>
-              <p className="text-gray-600">Strategic narrative and animation that speak directly to enterprise buyers.</p>
+              <h4
+                className="font-bold uppercase tracking-widest mb-2"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                The Epipheo Difference
+              </h4>
+              <p className="text-gray-600">
+                Strategic narrative and animation that speak directly to enterprise buyers.
+              </p>
             </div>
           </FadeIn>
         </div>
@@ -219,59 +418,129 @@ export default function EnterpriseExplainer() {
       {/* ── METHODOLOGY ────────────────────────────────────────────────── */}
       <section className="bg-[#111111] py-32 px-8">
         <div className="container mx-auto">
-          <div className="text-center mb-20">
-            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-4">Our Methodology</div>
-            <h2 className="text-5xl font-bold font-['Oswald'] uppercase">The Epipheo Way</h2>
-          </div>
+          <FadeIn>
+            <div
+              className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-4"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              Our Methodology
+            </div>
+            <h2
+              className="text-5xl font-bold uppercase mb-20"
+              style={{ fontFamily: "'Oswald', sans-serif" }}
+            >
+              The Epipheo Way
+            </h2>
+          </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-white/10">
             {[
-              { num: "01", title: "Discovery", text: "We dive deep into your complex solution to find the core epiphany. Our strategists interview your team to understand the \"why\" behind your product." },
-              { num: "02", title: "Script", text: "Crafting a narrative that resonates with enterprise decision-makers. We translate technical jargon into a persuasive, human-centric story." },
-              { num: "03", title: "Production", text: "High-fidelity animation (2D, 3D, or Motion Graphics) that matches your brand. Every frame is designed to maintain engagement and clarity." },
-              { num: "04", title: "Launch", text: "Delivering a strategic asset that drives results. We provide the final video in multiple formats optimized for your specific sales funnel." }
+              {
+                num: "01",
+                title: "Discovery",
+                text: 'We dive deep into your complex solution to find the core epiphany. Our strategists interview your team to understand the "why" behind your product.',
+              },
+              {
+                num: "02",
+                title: "Script",
+                text: "Crafting a narrative that resonates with enterprise decision-makers. We translate technical jargon into a persuasive, human-centric story.",
+              },
+              {
+                num: "03",
+                title: "Production",
+                text: "High-fidelity animation (2D, 3D, or Motion Graphics) that matches your brand. Every frame is designed to maintain engagement and clarity.",
+              },
+              {
+                num: "04",
+                title: "Launch",
+                text: "Delivering a strategic asset that drives results. We provide the final video in multiple formats optimized for your specific sales funnel.",
+              },
             ].map((step, i) => (
-              <div key={step.num} className={`p-10 border-white/10 ${i < 3 ? 'lg:border-r' : ''} ${i % 2 === 0 ? 'md:border-r lg:border-r' : ''}`}>
-                <div className="text-6xl font-bold font-['Oswald'] text-[#FF5F3C] mb-6">{step.num}</div>
-                <h3 className="text-2xl font-bold font-['Oswald'] uppercase mb-6 tracking-widest">{step.title}</h3>
+              <FadeIn
+                key={step.num}
+                delay={i * 0.1}
+                className={`p-10 border-white/10 ${
+                  i < 3 ? "lg:border-r" : ""
+                } ${i === 0 ? "md:border-r" : ""} ${i === 2 ? "md:border-r" : ""}`}
+              >
+                <div
+                  className="text-6xl font-bold text-[#FF5F3C] mb-6"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  {step.num}
+                </div>
+                <h3
+                  className="text-2xl font-bold uppercase mb-6 tracking-widest"
+                  style={{ fontFamily: "'Oswald', sans-serif" }}
+                >
+                  {step.title}
+                </h3>
                 <p className="text-gray-400 leading-relaxed">{step.text}</p>
-              </div>
+              </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── PORTFOLIO ──────────────────────────────────────────────────── */}
-      <section className="bg-white py-32 px-8 text-[#1A1A1A]">
+      <section id="portfolio" className="bg-white py-32 px-8 text-[#1A1A1A]">
         <div className="container mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold font-['Oswald'] uppercase mb-4">See the Epiphany in Action</h2>
-            <p className="text-gray-500">Strategic storytelling for the world's most complex brands.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-            {PORTFOLIO_VIDEOS.map((video) => (
-              <div key={video.title} className="group cursor-pointer">
-                <div className="aspect-video bg-black rounded mb-6 flex items-center justify-center relative overflow-hidden">
-                  <div className="w-12 h-12 bg-[#FF5F3C] rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
-                    <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent ml-1" />
+          <FadeIn>
+            <div className="text-center mb-20">
+              <h2
+                className="text-5xl font-bold uppercase mb-4"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                See the Epiphany in Action
+              </h2>
+              <p className="text-gray-500">
+                Strategic storytelling for the world's most complex brands.
+              </p>
+            </div>
+          </FadeIn>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-14">
+            {PORTFOLIO_VIDEOS.map((video, i) => (
+              <FadeIn key={video.id} delay={i * 0.05}>
+                <div>
+                  <WistiaVideo id={video.id} />
+                  <div className="mt-4">
+                    <p
+                      className="text-[#FF5F3C] text-xs font-bold tracking-widest uppercase mb-1"
+                      style={{ fontFamily: "'Oswald', sans-serif" }}
+                    >
+                      {video.client}
+                    </p>
+                    <h4
+                      className="font-bold uppercase tracking-widest text-base"
+                      style={{ fontFamily: "'Oswald', sans-serif" }}
+                    >
+                      {video.title}
+                    </h4>
                   </div>
                 </div>
-                <h4 className="font-bold font-['Oswald'] uppercase tracking-widest text-lg mb-1">{video.title}</h4>
-                <p className="text-xs font-bold text-gray-400 tracking-widest uppercase">{video.client}</p>
-              </div>
+              </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── QUOTE FORM ─────────────────────────────────────────────────── */}
-      <section id="quote" className="bg-[#F0F0F0] py-32 px-8 text-[#1A1A1A]">
+      <section id="get-a-quote" className="bg-[#F0F0F0] py-32 px-8 text-[#1A1A1A]">
         <div className="container mx-auto max-w-3xl">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold font-['Oswald'] uppercase mb-4">Get Your Custom Quote</h2>
-            <p className="text-gray-500">Ready to clarify your message? Fill out the form below and our team will be in touch.</p>
-          </div>
-          <div className="bg-white p-12 rounded shadow-xl">
-            <HubSpotForm />
+          <FadeIn>
+            <div className="text-center mb-16">
+              <h2
+                className="text-5xl font-bold uppercase mb-4"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                Get Your Custom Quote
+              </h2>
+              <p className="text-gray-500">
+                Ready to clarify your message? Fill out the form below and our team will be in touch.
+              </p>
+            </div>
+          </FadeIn>
+          <div className="bg-white p-10 md:p-14 rounded shadow-xl">
+            <QuoteForm />
           </div>
         </div>
       </section>
@@ -280,55 +549,166 @@ export default function EnterpriseExplainer() {
       <footer className="bg-[#111111] pt-24 pb-12 px-8">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+            {/* Brand */}
             <div>
-              <img src={LOGO_WHITE} alt="Epipheo" className="h-10 mb-8" />
-              <div className="text-gray-400 space-y-2 mb-8">
+              <a href="https://epipheo.com" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/logos/epipheo-white-cropped.png"
+                  alt="Epipheo"
+                  className="h-10 w-auto mb-8"
+                  style={{ filter: "brightness(0) invert(1)" }}
+                />
+              </a>
+              <div className="text-gray-400 space-y-2 mb-8 text-sm">
                 <p>888.687.7620</p>
                 <p>hello@epipheo.com</p>
                 <p>Cincinnati, OH</p>
               </div>
-              <div className="flex gap-6 text-xl">
-                <a href="#" className="hover:text-[#FF5F3C] transition-colors">f</a>
-                <a href="#" className="hover:text-[#FF5F3C] transition-colors">t</a>
-                <a href="#" className="hover:text-[#FF5F3C] transition-colors">in</a>
-                <a href="#" className="hover:text-[#FF5F3C] transition-colors">ig</a>
+              <div className="flex gap-5">
+                <a
+                  href="https://www.facebook.com/epipheo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
+                >
+                  FB
+                </a>
+                <a
+                  href="https://twitter.com/epipheo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
+                >
+                  TW
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/epipheo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
+                >
+                  LI
+                </a>
+                <a
+                  href="https://www.instagram.com/epipheo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
+                >
+                  IG
+                </a>
               </div>
             </div>
+
+            {/* Services */}
             <div>
-              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Services</h5>
-              <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Explainer Videos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">3D Explainer Videos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Testimonial Videos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Educational Videos</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Trade Show Videos</a></li>
+              <h5
+                className="font-bold uppercase tracking-widest text-[#FF5F3C] mb-8 text-sm"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                Services
+              </h5>
+              <ul className="space-y-4 text-gray-400 text-sm">
+                {[
+                  ["Explainer Videos", "https://epipheo.com/services/explainer-videos/"],
+                  ["3D Explainer Videos", "https://epipheo.com/services/3d-explainer-videos/"],
+                  ["Testimonial Videos", "https://epipheo.com/services/testimonial-videos/"],
+                  ["Educational Videos", "https://epipheo.com/services/educational-videos/"],
+                  ["Trade Show Videos", "https://epipheo.com/services/trade-show-videos/"],
+                ].map(([label, href]) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
+
+            {/* Company */}
             <div>
-              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Company</h5>
-              <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Portfolio</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              <h5
+                className="font-bold uppercase tracking-widest text-[#FF5F3C] mb-8 text-sm"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                Company
+              </h5>
+              <ul className="space-y-4 text-gray-400 text-sm">
+                {[
+                  ["About Us", "https://epipheo.com/about/"],
+                  ["Portfolio", "https://epipheo.com/portfolio/"],
+                  ["Careers", "https://epipheo.com/careers/"],
+                  ["Contact", "https://epipheo.com/contact/"],
+                  ["Blog", "https://epipheo.com/blog/"],
+                ].map(([label, href]) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
+
+            {/* Industries */}
             <div>
-              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Industries</h5>
-              <ul className="space-y-4 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">B2B Software</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Healthcare</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Finance</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Non-Profit</a></li>
+              <h5
+                className="font-bold uppercase tracking-widest text-[#FF5F3C] mb-8 text-sm"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
+              >
+                Industries
+              </h5>
+              <ul className="space-y-4 text-gray-400 text-sm">
+                {[
+                  ["B2B Software", "https://epipheo.com/industries/b2b-software/"],
+                  ["Healthcare", "https://epipheo.com/industries/healthcare/"],
+                  ["Finance", "https://epipheo.com/industries/finance/"],
+                  ["Non-Profit", "https://epipheo.com/industries/non-profit/"],
+                ].map(([label, href]) => (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
-          <div className="pt-12 border-t border-white/10 flex flex-col md:row items-center justify-between gap-4 text-[11px] text-gray-600 uppercase tracking-widest">
+
+          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 uppercase tracking-widest">
             <p>© 2026 Epipheo. All Rights Reserved.</p>
             <div className="flex gap-8">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a
+                href="https://epipheo.com/privacy-policy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="https://epipheo.com/terms-of-service/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+              >
+                Terms of Service
+              </a>
             </div>
           </div>
         </div>
