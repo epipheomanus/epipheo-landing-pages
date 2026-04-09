@@ -5,6 +5,7 @@ import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import EnterpriseExplainer from "./pages/EnterpriseExplainer";
 
 function Router() {
   return (
@@ -13,6 +14,7 @@ function Router() {
         <Redirect to="/production-partner" />
       </Route>
       <Route path={"/production-partner"} component={Home} />
+      <Route path={"/enterprise-explainer"} component={EnterpriseExplainer} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
