@@ -287,18 +287,18 @@ export default function EnterpriseExplainer() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={() => scrollToId("our-work")}
+                  onClick={() => scrollToId("get-a-quote")}
                   className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
-                  See Our Work
+                  Get a Quote
                 </button>
                 <button
-                  onClick={() => scrollToId("get-a-quote")}
+                  onClick={() => scrollToId("our-work")}
                   className="border-2 border-white text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:text-[#1A1A1A] transition-all"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
-                  Get a Custom Quote
+                  See Our Work
                 </button>
               </div>
             </FadeIn>
