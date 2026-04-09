@@ -1,50 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "@/hooks/useInView";
 
 /* ─── Constants ───────────────────────────────────────────────────────────── */
 const ACCENT = "#FF5F3C";
 const DARK = "#1A1A1A";
 const DARK_DEEPER = "#111111";
-const DARK_CARD = "#222222";
 const WHITE = "#FFFFFF";
-const WHITE_60 = "rgba(255,255,255,0.6)";
-const WHITE_40 = "rgba(255,255,255,0.4)";
-const WHITE_08 = "rgba(255,255,255,0.08)";
+const GRAY_TEXT = "#A0A0A0";
+const LIGHT_BG = "#F0F0F0";
 
-const LOGO_URL = "https://www.epipheo.com/wp-content/uploads/2023/06/Epipheo_Logo_White.svg";
+const LOGO_WHITE = "/logos/epipheo-white.svg";
 
-const VIDEOS = [
-  { id: "kc6uuxxwkz", client: "Splunk", title: "App Building" },
-  { id: "4yygbynwqj", client: "DeepSeas", title: "Overview" },
-  { id: "yqpykglhv0", client: "Backblaze", title: "B2B Brand Explainer" },
-  { id: "n3q5yhztjo", client: "Okta", title: "Highly Regulated Identity" },
-  { id: "tv6edcxd5i", client: "Early Warning", title: "Check Fraud" },
-  { id: "jxxmiu2fs1", client: "National Cryptocurrency Association", title: "Crypto Safety" },
+const CLIENT_LOGOS = [
+  { name: "OKTA", src: "/logos/okta.png" },
+  { name: "SPLUNK", src: "/logos/splunk.png" },
+  { name: "DELOITTE", src: "/logos/deloitte.png" },
+  { name: "IRACING", src: "/logos/iracing.png" },
+  { name: "CLEO", src: "/logos/cleo.png" },
+  { name: "POET", src: "/logos/poet.png" },
 ];
 
-const CLIENTS = ["Splunk", "DeepSeas", "Backblaze", "Okta", "Early Warning"];
-
-const STEPS = [
-  {
-    num: "01",
-    title: "Discovery",
-    desc: "We dig into your product, audience, and goals. We ask the hard questions so the video answers the right ones.",
-  },
-  {
-    num: "02",
-    title: "Script",
-    desc: "Our writers distill complexity into a clear, compelling narrative — the strategic backbone of every great explainer.",
-  },
-  {
-    num: "03",
-    title: "Production",
-    desc: "Design, animation, voiceover, sound — our team brings the script to life with craft and precision.",
-  },
-  {
-    num: "04",
-    title: "Launch",
-    desc: "Final delivery optimized for every channel. We make sure your video works as hard as you do.",
-  },
+const PORTFOLIO_VIDEOS = [
+  { id: "n3q5yhztjo", title: "PASSKEYS EXPLAINER", client: "OKTA" },
+  { id: "kc6uuxxwkz", title: "OBSERVABILITY PLATFORM", client: "SPLUNK" },
+  { id: "deloitte-placeholder", title: "CONVERGEHEALTH", client: "DELOITTE" },
+  { id: "iracing-placeholder", title: "FLAGSHIP EXPERIENCE", client: "IRACING" },
+  { id: "poet-placeholder", title: "FACILITY PROCESS", client: "POET" },
+  { id: "cleo-placeholder", title: "PLATFORM EXPLAINER", client: "CLEO" },
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -57,12 +39,10 @@ function FadeIn({
   children,
   className,
   delay = 0,
-  style: extraStyle,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
-  style?: React.CSSProperties;
 }) {
   const { ref, inView } = useInView(0.1);
   return (
@@ -71,9 +51,8 @@ function FadeIn({
       className={className}
       style={{
         opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
-        ...extraStyle,
+        transform: inView ? "translateY(0)" : "translateY(20px)",
+        transition: `opacity 0.8s ease ${delay}s, transform 0.8s ease ${delay}s`,
       }}
     >
       {children}
@@ -81,610 +60,276 @@ function FadeIn({
   );
 }
 
-/* ─── Wistia Video Card ───────────────────────────────────────────────────── */
-function WistiaVideo({ id, client, title }: { id: string; client: string; title: string }) {
-  return (
-    <div style={{ background: DARK_CARD, borderRadius: 8, overflow: "hidden" }}>
-      <div
-        className="wistia_responsive_padding"
-        style={{ padding: "56.25% 0 0 0", position: "relative" }}
-      >
-        <div
-          className="wistia_responsive_wrapper"
-          style={{ height: "100%", left: 0, position: "absolute", top: 0, width: "100%" }}
-        >
-          <div
-            className={`wistia_embed wistia_async_${id} seo=true videoFoam=true`}
-            style={{ height: "100%", position: "relative", width: "100%" }}
-          >
-            &nbsp;
-          </div>
-        </div>
-      </div>
-      <div style={{ padding: "16px 20px" }}>
-        <p
-          style={{
-            fontFamily: "'Oswald', sans-serif",
-            fontWeight: 700,
-            fontSize: 11,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase" as const,
-            color: ACCENT,
-            margin: 0,
-          }}
-        >
-          {client}
-        </p>
-        <p
-          style={{
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 500,
-            fontSize: 16,
-            color: WHITE,
-            margin: "4px 0 0",
-          }}
-        >
-          {title}
-        </p>
-      </div>
-    </div>
-  );
-}
+/* ─── Components ──────────────────────────────────────────────────────────── */
 
-/* ─── HubSpot Form ────────────────────────────────────────────────────────── */
 function HubSpotForm() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [loaded, setLoaded] = useState(false);
-
   useEffect(() => {
-    if (loaded) return;
-
-    function tryCreate() {
-      if ((window as any).hbspt?.forms?.create && containerRef.current) {
-        // Clear any previous form
-        containerRef.current.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "//js.hsforms.net/forms/embed/v2.js";
+    script.charset = "utf-8";
+    script.type = "text/javascript";
+    script.onload = () => {
+      if ((window as any).hbspt) {
         (window as any).hbspt.forms.create({
+          region: "na1",
           portalId: "20864859",
           formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
-          region: "na1",
-          target: containerRef.current,
+          target: "#hs-form-target"
         });
-        setLoaded(true);
       }
-    }
-
-    // Try immediately
-    tryCreate();
-
-    // Retry every 500ms for up to 10s
-    const interval = setInterval(tryCreate, 500);
-    const timeout = setTimeout(() => clearInterval(interval), 10000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
     };
-  }, [loaded]);
+    document.body.appendChild(script);
+  }, []);
 
-  return <div ref={containerRef} className="hs-form-container" />;
+  return <div id="hs-form-target" className="hs-form-container" />;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  MAIN PAGE COMPONENT                                                       */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 export default function EnterpriseExplainer() {
   const [scrolled, setScrolled] = useState(false);
 
-  // SEO meta tags for this page
   useEffect(() => {
-    document.title = "Enterprise Explainer Videos | Epipheo";
-    const setMeta = (attr: string, key: string, content: string) => {
-      let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, key);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
-    setMeta("name", "description", "Premium B2B explainer videos for enterprise teams. Epipheo turns complex solutions into compelling stories that drive sales. See our work and get a custom quote.");
-    setMeta("property", "og:title", "Enterprise Explainer Videos | Epipheo");
-    setMeta("property", "og:description", "Premium B2B explainer videos for enterprise teams. Epipheo turns complex solutions into compelling stories that drive sales.");
-    setMeta("property", "og:url", "https://go.epipheo.com/enterprise-explainer");
-    setMeta("name", "robots", "index, follow");
-  }, []);
-
-  useEffect(() => {
-    // Load Wistia embed scripts once
-    if (!document.querySelector('script[src*="fast.wistia.com/assets/external/E-v1.js"]')) {
-      const s = document.createElement("script");
-      s.src = "https://fast.wistia.com/assets/external/E-v1.js";
-      s.async = true;
-      document.head.appendChild(s);
-    }
-    VIDEOS.forEach((v) => {
-      const scriptId = `wistia-${v.id}`;
-      if (!document.getElementById(scriptId)) {
-        const s = document.createElement("script");
-        s.id = scriptId;
-        s.src = `https://fast.wistia.com/embed/medias/${v.id}.jsonp`;
-        s.async = true;
-        document.head.appendChild(s);
-      }
-    });
-
-    // Scroll listener for nav
-    const handler = () => setScrolled(window.scrollY > 40);
+    const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
+    document.title = "Enterprise Explainer Videos | Epipheo";
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
   return (
-    <div style={{ background: DARK, color: WHITE, fontFamily: "'Barlow', sans-serif" }}>
+    <div className="min-h-screen bg-[#1A1A1A] text-white font-['Barlow']">
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <nav
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          background: scrolled ? "rgba(17,17,17,0.97)" : "transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: scrolled ? `1px solid ${WHITE_08}` : "none",
-          transition: "all 0.3s ease",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "16px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <a href="https://www.epipheo.com" target="_blank" rel="noopener noreferrer">
-            <img src={LOGO_URL} alt="Epipheo" style={{ height: 28, width: "auto" }} />
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#111111]/95 backdrop-blur-md py-4' : 'bg-transparent py-6'}`}>
+        <div className="container mx-auto px-8 flex items-center justify-between">
+          <a href="https://epipheo.com" target="_blank" rel="noopener noreferrer">
+            <img src={LOGO_WHITE} alt="Epipheo" className="h-8" />
           </a>
-          <button
-            onClick={() => scrollTo("get-a-quote")}
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontWeight: 700,
-              fontSize: 13,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase" as const,
-              background: ACCENT,
-              color: WHITE,
-              border: "none",
-              borderRadius: 999,
-              padding: "10px 28px",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLElement).style.transform = "translateY(-1px)";
-              (e.target as HTMLElement).style.boxShadow = `0 8px 24px rgba(255,95,60,0.4)`;
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLElement).style.transform = "translateY(0)";
-              (e.target as HTMLElement).style.boxShadow = "none";
-            }}
-          >
-            Get a Quote
-          </button>
+          <div className="hidden md:flex items-center gap-8 text-[13px] font-bold tracking-widest uppercase font-['Oswald']">
+            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Portfolio</a>
+            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Services</a>
+            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Industries</a>
+            <a href="#" className="hover:text-[#FF5F3C] transition-colors">Resources</a>
+            <button 
+              onClick={() => scrollTo('quote')}
+              className="bg-[#FF5F3C] text-white px-6 py-2.5 rounded-full hover:bg-[#ff7a5c] transition-all transform hover:-translateY-0.5"
+            >
+              Get a Quote
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section
-        style={{
-          position: "relative",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          background: `linear-gradient(135deg, ${DARK_DEEPER} 0%, ${DARK} 50%, #1f1410 100%)`,
-        }}
-      >
-        {/* Subtle geometric pattern overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.04,
-            backgroundImage: `radial-gradient(circle at 20% 50%, ${ACCENT} 1px, transparent 1px), radial-gradient(circle at 80% 20%, ${ACCENT} 1px, transparent 1px), radial-gradient(circle at 60% 80%, ${ACCENT} 1px, transparent 1px)`,
-            backgroundSize: "120px 120px, 80px 80px, 160px 160px",
-          }}
-        />
-        {/* Gradient glow */}
-        <div
-          style={{
-            position: "absolute",
-            top: "20%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 600,
-            height: 600,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, rgba(255,95,60,0.08) 0%, transparent 70%)`,
-            pointerEvents: "none",
-          }}
-        />
-
-        <div style={{ position: "relative", zIndex: 1, textAlign: "center", maxWidth: 800, padding: "120px 24px 80px" }}>
-          <FadeIn>
-            <h1
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(36px, 6vw, 64px)",
-                lineHeight: 1.1,
-                textTransform: "uppercase" as const,
-                letterSpacing: "-0.01em",
-                margin: 0,
-              }}
-            >
-              Your Product Is Powerful.
-              <br />
-              <span style={{ color: ACCENT }}>Let Us Make It Clear.</span>
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.15}>
-            <p
-              style={{
-                fontSize: "clamp(17px, 2.2vw, 21px)",
-                lineHeight: 1.6,
-                color: WHITE_60,
-                maxWidth: 600,
-                margin: "24px auto 0",
-              }}
-            >
-              Enterprise explainer videos that turn complex solutions into compelling stories.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.3}>
-            <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 40, flexWrap: "wrap" }}>
-              <button
-                onClick={() => scrollTo("portfolio")}
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase" as const,
-                  background: ACCENT,
-                  color: WHITE,
-                  border: "none",
-                  borderRadius: 999,
-                  padding: "14px 36px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.transform = "translateY(-2px)";
-                  (e.target as HTMLElement).style.boxShadow = `0 8px 24px rgba(255,95,60,0.4)`;
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.transform = "translateY(0)";
-                  (e.target as HTMLElement).style.boxShadow = "none";
-                }}
-              >
-                See Our Work
-              </button>
-              <button
-                onClick={() => scrollTo("get-a-quote")}
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase" as const,
-                  background: "transparent",
-                  color: WHITE,
-                  border: `2px solid ${WHITE_40}`,
-                  borderRadius: 999,
-                  padding: "12px 36px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.borderColor = ACCENT;
-                  (e.target as HTMLElement).style.color = ACCENT;
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.borderColor = WHITE_40;
-                  (e.target as HTMLElement).style.color = WHITE;
-                }}
-              >
-                Get a Custom Quote
-              </button>
-            </div>
-          </FadeIn>
+      <section className="relative pt-40 pb-32 px-8 overflow-hidden">
+        <div className="container mx-auto flex flex-col lg:flex-row items-center gap-16">
+          <div className="lg:w-1/2">
+            <FadeIn>
+              <h1 className="text-5xl md:text-7xl font-bold font-['Oswald'] leading-[1.1] mb-8 uppercase">
+                Complex Solutions<br />
+                Deserve <span className="text-white">Clear</span><br />
+                Explanations
+              </h1>
+              <p className="text-xl text-gray-400 mb-10 max-w-lg leading-relaxed">
+                We explain the complex so your buyers can confidently say yes. Premium animated explainer videos for enterprise B2B solutions.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button 
+                  onClick={() => scrollTo('quote')}
+                  className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold font-['Oswald'] tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
+                >
+                  Get Your Custom Quote
+                </button>
+                <button className="border-2 border-white text-white px-10 py-4 rounded-full font-bold font-['Oswald'] tracking-widest uppercase hover:bg-white hover:text-black transition-all">
+                  Watch Our Reel
+                </button>
+              </div>
+            </FadeIn>
+          </div>
+          <div className="lg:w-1/2 w-full">
+            <FadeIn delay={0.2}>
+              <div className="aspect-video bg-black/40 rounded-lg border border-white/10 flex items-center justify-center relative group cursor-pointer">
+                <div className="w-20 h-20 bg-[#FF5F3C] rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                  <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-white border-b-[12px] border-b-transparent ml-2" />
+                </div>
+                <div className="absolute bottom-4 left-4 text-[10px] text-white/20 font-mono uppercase tracking-widest">
+                  [ Background Video Placeholder ]
+                </div>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF / CLIENT LOGOS ─────────────────────────────────── */}
-      <section style={{ background: DARK_DEEPER, borderTop: `1px solid ${WHITE_08}`, borderBottom: `1px solid ${WHITE_08}` }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 24px", textAlign: "center" }}>
-          <p
-            style={{
-              fontFamily: "'Barlow', sans-serif",
-              fontSize: 13,
-              letterSpacing: "0.15em",
-              textTransform: "uppercase" as const,
-              color: WHITE_40,
-              margin: "0 0 32px",
-            }}
-          >
-            Trusted by innovative companies worldwide
-          </p>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "clamp(24px, 5vw, 64px)",
-              flexWrap: "wrap",
-            }}
-          >
-            {CLIENTS.map((name) => (
-              <span
-                key={name}
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "clamp(16px, 2vw, 22px)",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase" as const,
-                  color: "rgba(255,255,255,0.25)",
-                }}
-              >
-                {name}
-              </span>
+      {/* ── SOCIAL PROOF ────────────────────────────────────────────────── */}
+      <section className="bg-[#F0F0F0] py-20 px-8 text-[#1A1A1A]">
+        <div className="container mx-auto text-center">
+          <h2 className="text-2xl font-bold font-['Oswald'] tracking-widest uppercase mb-12">
+            Trusted by the World's Most Iconic Brands
+          </h2>
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 mb-20">
+            {CLIENT_LOGOS.map((logo) => (
+              <div key={logo.name} className="bg-white px-8 py-4 rounded shadow-sm flex items-center justify-center min-w-[140px]">
+                <span className="font-bold font-['Oswald'] text-gray-300 tracking-widest">{logo.name}</span>
+              </div>
             ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+            <div>
+              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">6,000+</div>
+              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Videos Delivered</div>
+            </div>
+            <div>
+              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">15+</div>
+              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Years Experience</div>
+            </div>
+            <div>
+              <div className="text-5xl font-bold font-['Oswald'] text-[#FF5F3C] mb-2">50+</div>
+              <div className="text-sm font-bold font-['Oswald'] tracking-widest uppercase">Fortune 500 Clients</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── PROBLEM / SOLUTION ─────────────────────────────────────────── */}
-      <section style={{ background: DARK }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "100px 24px", textAlign: "center" }}>
+      <section className="bg-white py-32 px-8 text-[#1A1A1A]">
+        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24">
           <FadeIn>
-            <h2
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(28px, 4vw, 44px)",
-                textTransform: "uppercase" as const,
-                lineHeight: 1.15,
-                margin: 0,
-              }}
-            >
-              Complex Solutions Deserve{" "}
-              <span style={{ color: ACCENT }}>Clear Explanations</span>
+            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6">The Problem</div>
+            <h2 className="text-4xl md:text-5xl font-bold font-['Oswald'] leading-tight uppercase mb-8">
+              Your Product is Powerful. But if prospects don't understand it, they won't buy it.
             </h2>
-          </FadeIn>
-          <FadeIn delay={0.15}>
-            <p
-              style={{
-                fontSize: "clamp(16px, 1.8vw, 19px)",
-                lineHeight: 1.75,
-                color: WHITE_60,
-                marginTop: 28,
-              }}
-            >
-              Your product does something incredible — but if your buyers can't grasp it in 90 seconds,
-              you're losing deals to simpler competitors. That's the gap we close. Epipheo has spent over
-              a decade turning complex B2B solutions into stories that click. We don't just make things
-              pretty — we make them understood. And when people understand, they buy.
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Stop losing deals to confusion. In enterprise B2B, complexity is the enemy of conversion.
             </p>
           </FadeIn>
-          <FadeIn delay={0.3}>
-            <p
-              style={{
-                fontSize: "clamp(16px, 1.8vw, 19px)",
-                lineHeight: 1.75,
-                color: WHITE_60,
-                marginTop: 20,
-              }}
-            >
-              From cybersecurity platforms to fintech infrastructure, we've helped enterprise teams
-              bridge the gap between what they build and what their audience needs to hear.
+          <FadeIn delay={0.2}>
+            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-6">The Solution</div>
+            <h2 className="text-4xl md:text-5xl font-bold font-['Oswald'] leading-tight uppercase mb-8">
+              We explain the complex so your buyers can confidently say yes.
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-10">
+              Epipheo crafts strategic storytelling that turns complexity into clarity for decision-makers.
             </p>
+            <div className="bg-[#F0F0F0] p-8 border-l-4 border-[#FF5F3C]">
+              <h4 className="font-bold font-['Oswald'] uppercase tracking-widest mb-2">The Epipheo Difference</h4>
+              <p className="text-gray-600">Strategic narrative and animation that speak directly to enterprise buyers.</p>
+            </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* ── METHODOLOGY ────────────────────────────────────────────────── */}
+      <section className="bg-[#111111] py-32 px-8">
+        <div className="container mx-auto">
+          <div className="text-center mb-20">
+            <div className="text-[13px] font-bold text-[#FF5F3C] tracking-widest uppercase mb-4">Our Methodology</div>
+            <h2 className="text-5xl font-bold font-['Oswald'] uppercase">The Epipheo Way</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-white/10">
+            {[
+              { num: "01", title: "Discovery", text: "We dive deep into your complex solution to find the core epiphany. Our strategists interview your team to understand the \"why\" behind your product." },
+              { num: "02", title: "Script", text: "Crafting a narrative that resonates with enterprise decision-makers. We translate technical jargon into a persuasive, human-centric story." },
+              { num: "03", title: "Production", text: "High-fidelity animation (2D, 3D, or Motion Graphics) that matches your brand. Every frame is designed to maintain engagement and clarity." },
+              { num: "04", title: "Launch", text: "Delivering a strategic asset that drives results. We provide the final video in multiple formats optimized for your specific sales funnel." }
+            ].map((step, i) => (
+              <div key={step.num} className={`p-10 border-white/10 ${i < 3 ? 'lg:border-r' : ''} ${i % 2 === 0 ? 'md:border-r lg:border-r' : ''}`}>
+                <div className="text-6xl font-bold font-['Oswald'] text-[#FF5F3C] mb-6">{step.num}</div>
+                <h3 className="text-2xl font-bold font-['Oswald'] uppercase mb-6 tracking-widest">{step.title}</h3>
+                <p className="text-gray-400 leading-relaxed">{step.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── PORTFOLIO ──────────────────────────────────────────────────── */}
-      <section id="portfolio" style={{ background: DARK_DEEPER }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 24px" }}>
-          <FadeIn>
-            <h2
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(28px, 4vw, 44px)",
-                textTransform: "uppercase" as const,
-                textAlign: "center",
-                margin: "0 0 56px",
-              }}
-            >
-              Our Work <span style={{ color: ACCENT }}>Speaks for Itself</span>
-            </h2>
-          </FadeIn>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 480px), 1fr))",
-              gap: 24,
-            }}
-          >
-            {VIDEOS.map((v, i) => (
-              <FadeIn key={v.id} delay={i * 0.1}>
-                <WistiaVideo {...v} />
-              </FadeIn>
-            ))}
+      <section className="bg-white py-32 px-8 text-[#1A1A1A]">
+        <div className="container mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold font-['Oswald'] uppercase mb-4">See the Epiphany in Action</h2>
+            <p className="text-gray-500">Strategic storytelling for the world's most complex brands.</p>
           </div>
-        </div>
-      </section>
-
-      {/* ── PROCESS ────────────────────────────────────────────────────── */}
-      <section style={{ background: DARK }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "100px 24px" }}>
-          <FadeIn>
-            <h2
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(28px, 4vw, 44px)",
-                textTransform: "uppercase" as const,
-                textAlign: "center",
-                margin: "0 0 64px",
-              }}
-            >
-              How We <span style={{ color: ACCENT }}>Work</span>
-            </h2>
-          </FadeIn>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
-              gap: 32,
-            }}
-          >
-            {STEPS.map((step, i) => (
-              <FadeIn key={step.num} delay={i * 0.12}>
-                <div
-                  style={{
-                    background: DARK_CARD,
-                    borderRadius: 8,
-                    padding: "36px 28px",
-                    borderTop: `3px solid ${ACCENT}`,
-                    height: "100%",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'Oswald', sans-serif",
-                      fontWeight: 700,
-                      fontSize: 40,
-                      color: "rgba(255,95,60,0.2)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {step.num}
-                  </span>
-                  <h3
-                    style={{
-                      fontFamily: "'Oswald', sans-serif",
-                      fontWeight: 700,
-                      fontSize: 22,
-                      textTransform: "uppercase" as const,
-                      letterSpacing: "0.05em",
-                      margin: "12px 0 12px",
-                    }}
-                  >
-                    {step.title}
-                  </h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.65, color: WHITE_60, margin: 0 }}>
-                    {step.desc}
-                  </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+            {PORTFOLIO_VIDEOS.map((video) => (
+              <div key={video.title} className="group cursor-pointer">
+                <div className="aspect-video bg-black rounded mb-6 flex items-center justify-center relative overflow-hidden">
+                  <div className="w-12 h-12 bg-[#FF5F3C] rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                    <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent ml-1" />
+                  </div>
                 </div>
-              </FadeIn>
+                <h4 className="font-bold font-['Oswald'] uppercase tracking-widest text-lg mb-1">{video.title}</h4>
+                <p className="text-xs font-bold text-gray-400 tracking-widest uppercase">{video.client}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── HUBSPOT FORM ───────────────────────────────────────────────── */}
-      <section id="get-a-quote" style={{ background: DARK_DEEPER }}>
-        <div style={{ maxWidth: 640, margin: "0 auto", padding: "100px 24px" }}>
-          <FadeIn>
-            <h2
-              style={{
-                fontFamily: "'Oswald', sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(28px, 4vw, 40px)",
-                textTransform: "uppercase" as const,
-                textAlign: "center",
-                margin: 0,
-              }}
-            >
-              Ready to Make Your Message{" "}
-              <span style={{ color: ACCENT }}>Clear?</span>
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.12}>
-            <p
-              style={{
-                fontSize: 17,
-                lineHeight: 1.6,
-                color: WHITE_60,
-                textAlign: "center",
-                margin: "16px 0 48px",
-              }}
-            >
-              Tell us about your project and we'll put together a custom proposal.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.24}>
+      {/* ── QUOTE FORM ─────────────────────────────────────────────────── */}
+      <section id="quote" className="bg-[#F0F0F0] py-32 px-8 text-[#1A1A1A]">
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold font-['Oswald'] uppercase mb-4">Get Your Custom Quote</h2>
+            <p className="text-gray-500">Ready to clarify your message? Fill out the form below and our team will be in touch.</p>
+          </div>
+          <div className="bg-white p-12 rounded shadow-xl">
             <HubSpotForm />
-          </FadeIn>
+          </div>
         </div>
       </section>
 
       {/* ── FOOTER ─────────────────────────────────────────────────────── */}
-      <footer
-        style={{
-          background: DARK_DEEPER,
-          borderTop: `1px solid ${WHITE_08}`,
-          padding: "40px 24px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 16,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            <a href="https://www.epipheo.com" target="_blank" rel="noopener noreferrer">
-              <img src={LOGO_URL} alt="Epipheo" style={{ height: 22, width: "auto", opacity: 0.6 }} />
-            </a>
-            <span style={{ fontSize: 13, color: WHITE_40 }}>
-              &copy; {new Date().getFullYear()} Epipheo. All rights reserved.
-            </span>
+      <footer className="bg-[#111111] pt-24 pb-12 px-8">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
+            <div>
+              <img src={LOGO_WHITE} alt="Epipheo" className="h-10 mb-8" />
+              <div className="text-gray-400 space-y-2 mb-8">
+                <p>888.687.7620</p>
+                <p>hello@epipheo.com</p>
+                <p>Cincinnati, OH</p>
+              </div>
+              <div className="flex gap-6 text-xl">
+                <a href="#" className="hover:text-[#FF5F3C] transition-colors">f</a>
+                <a href="#" className="hover:text-[#FF5F3C] transition-colors">t</a>
+                <a href="#" className="hover:text-[#FF5F3C] transition-colors">in</a>
+                <a href="#" className="hover:text-[#FF5F3C] transition-colors">ig</a>
+              </div>
+            </div>
+            <div>
+              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Services</h5>
+              <ul className="space-y-4 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Explainer Videos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">3D Explainer Videos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Testimonial Videos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Educational Videos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Trade Show Videos</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Company</h5>
+              <ul className="space-y-4 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Portfolio</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="font-bold font-['Oswald'] uppercase tracking-widest text-[#FF5F3C] mb-8">Industries</h5>
+              <ul className="space-y-4 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">B2B Software</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Healthcare</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Finance</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Non-Profit</a></li>
+              </ul>
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <a
-              href="https://www.epipheo.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 13, color: WHITE_40, textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.color = WHITE)}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.color = WHITE_40)}
-            >
-              epipheo.com
-            </a>
-            <a
-              href="https://www.linkedin.com/company/epipheo"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 13, color: WHITE_40, textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.color = WHITE)}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.color = WHITE_40)}
-            >
-              LinkedIn
-            </a>
+          <div className="pt-12 border-t border-white/10 flex flex-col md:row items-center justify-between gap-4 text-[11px] text-gray-600 uppercase tracking-widest">
+            <p>© 2026 Epipheo. All Rights Reserved.</p>
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            </div>
           </div>
         </div>
       </footer>
