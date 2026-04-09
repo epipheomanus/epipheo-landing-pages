@@ -11,13 +11,13 @@ const PORTFOLIO_VIDEOS = [
   { id: "jxxmiu2fs1", client: "NATIONAL CRYPTOCURRENCY ASSOCIATION", title: "Crypto Safety" },
 ];
 
-/* ─── Client Logos ────────────────────────────────────────────────────────── */
+/* ─── Client Logos (real PNGs, will be greyscaled via CSS) ────────────────── */
 const CLIENT_LOGOS = [
-  { name: "SPLUNK", src: "/logos/splunk-logo.svg" },
-  { name: "OKTA", src: "/logos/okta-logo.svg" },
-  { name: "BACKBLAZE", src: "/logos/backblaze.svg" },
-  { name: "EARLY WARNING", src: "/logos/epipheo-orange.svg" },
-  { name: "DEEPSEAS", src: "/logos/epipheo-orange.svg" },
+  { name: "Splunk", src: "/logos/splunk.png" },
+  { name: "Okta", src: "/logos/okta.png" },
+  { name: "Backblaze", src: "/logos/backblaze.png" },
+  { name: "DeepSeas", src: "/logos/deepseas.png" },
+  { name: "Early Warning", src: "/logos/earlywarning.png" },
 ];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -54,7 +54,6 @@ function FadeIn({
 /* ─── Wistia Video Component ──────────────────────────────────────────────── */
 function WistiaVideo({ id }: { id: string }) {
   useEffect(() => {
-    // Load Wistia scripts once per video
     const jsonpSrc = `https://fast.wistia.com/embed/medias/${id}.jsonp`;
     if (!document.querySelector(`script[src="${jsonpSrc}"]`)) {
       const s1 = document.createElement("script");
@@ -125,39 +124,21 @@ function QuoteForm() {
 
   return (
     <div>
-      {/* Standalone budget dropdown — not part of HubSpot form */}
+      {/* Budget dropdown — above HubSpot form */}
       <div style={{ marginBottom: "20px" }}>
         <label
           htmlFor="budget-range"
-          style={{
-            display: "block",
-            marginBottom: "8px",
-            fontFamily: "'Oswald', sans-serif",
-            fontWeight: 700,
-            textTransform: "uppercase" as const,
-            letterSpacing: "0.1em",
-            fontSize: "13px",
-            color: "#1A1A1A",
-          }}
+          className="block mb-2 text-xs font-bold uppercase tracking-widest text-gray-300"
+          style={{ fontFamily: "'Oswald', sans-serif" }}
         >
           Estimated Budget
         </label>
         <select
           id="budget-range"
-          style={{
-            width: "100%",
-            padding: "12px 16px",
-            border: "1px solid #E0E0E0",
-            borderRadius: "4px",
-            background: "#F9F9F9",
-            color: "#1A1A1A",
-            fontFamily: "'Barlow', sans-serif",
-            fontSize: "16px",
-            appearance: "auto" as const,
-          }}
+          className="w-full px-4 py-3 rounded bg-[#2A2A2A] border border-white/20 text-white text-base focus:outline-none focus:border-[#FF5F3C] transition-colors"
+          style={{ fontFamily: "'Barlow', sans-serif" }}
         >
           <option value="">Select a range...</option>
-          <option value="under-10k">Under $10,000</option>
           <option value="10k-25k">$10,000 – $25,000</option>
           <option value="25k-50k">$25,000 – $50,000</option>
           <option value="50k-100k">$50,000 – $100,000</option>
@@ -166,7 +147,78 @@ function QuoteForm() {
       </div>
 
       {/* HubSpot form */}
-      <div id="hs-form-target" className="hs-form-container" />
+      <div id="hs-form-target" />
+
+      {/* Style overrides for HubSpot form on dark background */}
+      <style>{`
+        #hs-form-target .hs-form-field label {
+          color: #D1D5DB !important;
+          font-family: 'Oswald', sans-serif !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.1em !important;
+          font-size: 12px !important;
+        }
+        #hs-form-target .hs-input {
+          background: #2A2A2A !important;
+          border: 1px solid rgba(255,255,255,0.2) !important;
+          color: #fff !important;
+          border-radius: 4px !important;
+          padding: 12px 16px !important;
+          font-family: 'Barlow', sans-serif !important;
+          font-size: 16px !important;
+          width: 100% !important;
+        }
+        #hs-form-target .hs-input:focus {
+          border-color: #FF5F3C !important;
+          outline: none !important;
+        }
+        #hs-form-target .hs-input::placeholder {
+          color: #6B7280 !important;
+        }
+        #hs-form-target textarea.hs-input {
+          min-height: 100px !important;
+        }
+        #hs-form-target .hs-submit .hs-button {
+          background: #FF5F3C !important;
+          color: #fff !important;
+          border: none !important;
+          border-radius: 9999px !important;
+          padding: 14px 40px !important;
+          font-family: 'Oswald', sans-serif !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.15em !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: background 0.2s !important;
+          width: 100% !important;
+        }
+        #hs-form-target .hs-submit .hs-button:hover {
+          background: #ff7a5c !important;
+        }
+        #hs-form-target .hs-error-msgs label {
+          color: #FF5F3C !important;
+          font-size: 12px !important;
+        }
+        #hs-form-target .hs-form-field {
+          margin-bottom: 16px !important;
+        }
+        #hs-form-target .legal-consent-container .hs-form-booleancheckbox-display > span {
+          color: #9CA3AF !important;
+          font-size: 12px !important;
+        }
+        #hs-form-target .legal-consent-container a {
+          color: #FF5F3C !important;
+        }
+        #hs-form-target .submitted-message {
+          color: #fff !important;
+          font-family: 'Barlow', sans-serif !important;
+        }
+        #hs-form-target .hs-richtext p {
+          color: #9CA3AF !important;
+        }
+      `}</style>
     </div>
   );
 }
@@ -195,7 +247,7 @@ export default function EnterpriseExplainer() {
       {/* ── NAV (Minimal: Logo + CTA only) ─────────────────────────────── */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-[#111111]/95 backdrop-blur-md py-4" : "bg-[#1A1A1A]/80 backdrop-blur-sm py-6"
+          scrolled ? "bg-[#111111]/95 backdrop-blur-md py-4" : "bg-transparent py-6"
         }`}
       >
         <div className="container mx-auto px-8 flex items-center justify-between">
@@ -203,8 +255,7 @@ export default function EnterpriseExplainer() {
             <img
               src="/logos/epipheo-white-cropped.png"
               alt="Epipheo"
-              className="h-8 w-auto"
-              style={{ filter: "brightness(0) invert(1)" }}
+              className="h-10 w-auto"
             />
           </a>
           <button
@@ -217,23 +268,24 @@ export default function EnterpriseExplainer() {
         </div>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section className="relative pt-40 pb-32 px-8 overflow-hidden bg-[#1A1A1A]">
+      {/* ── HERO (Split layout: text left, video right) ────────────────── */}
+      <section className="relative pt-36 pb-24 px-8 overflow-hidden bg-[#1A1A1A]">
         <div className="container mx-auto">
-          <div className="max-w-3xl mx-auto text-center mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Text + CTAs */}
             <FadeIn>
               <h1
-                className="text-5xl md:text-7xl font-bold leading-[1.05] mb-8 uppercase"
+                className="text-5xl md:text-6xl xl:text-7xl font-bold leading-[1.05] mb-8 uppercase"
                 style={{ fontFamily: "'Oswald', sans-serif" }}
               >
                 Complex Solutions<br />
                 Deserve Clear<br />
-                Explanations
+                <span className="text-[#FF5F3C]">Explanations</span>
               </h1>
-              <p className="text-xl text-gray-400 mb-10 leading-relaxed">
+              <p className="text-xl text-gray-400 mb-10 leading-relaxed max-w-lg">
                 We explain the complex so your buyers can confidently say yes. Premium animated explainer videos for enterprise B2B solutions.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap gap-4">
                 <button
                   onClick={() => scrollToId("our-work")}
                   className="bg-[#FF5F3C] text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-[#ff7a5c] transition-all"
@@ -243,19 +295,21 @@ export default function EnterpriseExplainer() {
                 </button>
                 <button
                   onClick={() => scrollToId("get-a-quote")}
-                  className="border-2 border-white text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all"
+                  className="border-2 border-white text-white px-10 py-4 rounded-full font-bold tracking-widest uppercase hover:bg-white hover:text-[#1A1A1A] transition-all"
                   style={{ fontFamily: "'Oswald', sans-serif" }}
                 >
                   Get a Custom Quote
                 </button>
               </div>
             </FadeIn>
-          </div>
 
-          {/* Hero Wistia Video */}
-          <FadeIn delay={0.2} className="max-w-4xl mx-auto">
-            <WistiaVideo id="l8418oscmu" />
-          </FadeIn>
+            {/* Right: Reel Video */}
+            <FadeIn delay={0.2}>
+              <div className="rounded-lg overflow-hidden shadow-2xl">
+                <WistiaVideo id="l8418oscmu" />
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
@@ -268,19 +322,21 @@ export default function EnterpriseExplainer() {
           >
             Trusted by the World's Most Iconic Brands
           </h2>
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-20">
+          <div className="flex flex-wrap justify-center items-center gap-10 mb-20">
             {CLIENT_LOGOS.map((logo) => (
               <div
                 key={logo.name}
-                className="bg-white px-8 py-6 rounded shadow-sm flex items-center justify-center min-w-[120px] h-20"
+                className="bg-white px-8 py-5 rounded shadow-sm flex items-center justify-center"
+                style={{ minWidth: "140px", height: "70px" }}
               >
                 <img
                   src={logo.src}
                   alt={logo.name}
                   style={{
-                    maxHeight: "40px",
-                    maxWidth: "100%",
-                    filter: "grayscale(100%) brightness(2)",
+                    maxHeight: "36px",
+                    maxWidth: "120px",
+                    objectFit: "contain",
+                    filter: "grayscale(100%) opacity(0.5)",
                   }}
                 />
               </div>
@@ -405,9 +461,7 @@ export default function EnterpriseExplainer() {
               <FadeIn
                 key={step.num}
                 delay={i * 0.1}
-                className={`p-10 border-white/10 ${
-                  i < 3 ? "lg:border-r" : ""
-                } ${i === 0 ? "md:border-r" : ""} ${i === 2 ? "md:border-r" : ""}`}
+                className={`p-10 ${i < 3 ? "lg:border-r border-white/10" : ""}`}
               >
                 <div
                   className="text-6xl font-bold text-[#FF5F3C] mb-6"
@@ -448,7 +502,9 @@ export default function EnterpriseExplainer() {
             {PORTFOLIO_VIDEOS.map((video, i) => (
               <FadeIn key={video.id} delay={i * 0.05}>
                 <div>
-                  <WistiaVideo id={video.id} />
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <WistiaVideo id={video.id} />
+                  </div>
                   <div className="mt-4">
                     <p
                       className="text-[#FF5F3C] text-xs font-bold tracking-widest uppercase mb-1"
@@ -471,22 +527,22 @@ export default function EnterpriseExplainer() {
       </section>
 
       {/* ── QUOTE FORM ─────────────────────────────────────────────────── */}
-      <section id="get-a-quote" className="bg-[#F0F0F0] py-32 px-8 text-[#1A1A1A]">
-        <div className="container mx-auto max-w-3xl">
+      <section id="get-a-quote" className="bg-[#1A1A1A] py-32 px-8">
+        <div className="container mx-auto max-w-2xl">
           <FadeIn>
             <div className="text-center mb-16">
               <h2
                 className="text-5xl font-bold uppercase mb-4"
                 style={{ fontFamily: "'Oswald', sans-serif" }}
               >
-                Get Your Custom Quote
+                Get Your Custom <span className="text-[#FF5F3C]">Quote</span>
               </h2>
-              <p className="text-gray-500">
+              <p className="text-gray-400">
                 Ready to clarify your message? Fill out the form below and our team will be in touch.
               </p>
             </div>
           </FadeIn>
-          <div className="bg-white p-10 md:p-14 rounded shadow-xl">
+          <div className="bg-[#222222] p-10 md:p-14 rounded-lg border border-white/10">
             <QuoteForm />
           </div>
         </div>
@@ -503,47 +559,29 @@ export default function EnterpriseExplainer() {
                   src="/logos/epipheo-white-cropped.png"
                   alt="Epipheo"
                   className="h-10 w-auto mb-8"
-                  style={{ filter: "brightness(0) invert(1)" }}
                 />
               </a>
               <div className="text-gray-400 space-y-2 mb-8 text-sm">
                 <p>888.687.7620</p>
-                <p>hello@epipheo.com</p>
                 <p>Cincinnati, OH</p>
               </div>
               <div className="flex gap-5">
-                <a
-                  href="https://www.facebook.com/epipheo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
-                >
-                  FB
-                </a>
-                <a
-                  href="https://twitter.com/epipheo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
-                >
-                  TW
-                </a>
-                <a
-                  href="https://www.linkedin.com/company/epipheo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
-                >
-                  LI
-                </a>
-                <a
-                  href="https://www.instagram.com/epipheo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
-                >
-                  IG
-                </a>
+                {[
+                  { label: "FB", href: "https://www.facebook.com/epipheo" },
+                  { label: "TW", href: "https://twitter.com/epipheo" },
+                  { label: "LI", href: "https://www.linkedin.com/company/epipheo" },
+                  { label: "IG", href: "https://www.instagram.com/epipheo" },
+                ].map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#FF5F3C] transition-colors text-sm"
+                  >
+                    {s.label}
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -557,11 +595,11 @@ export default function EnterpriseExplainer() {
               </h5>
               <ul className="space-y-4 text-gray-400 text-sm">
                 {[
-                  ["Explainer Videos", "https://epipheo.com/services/explainer-videos/"],
-                  ["3D Explainer Videos", "https://epipheo.com/services/3d-explainer-videos/"],
-                  ["Testimonial Videos", "https://epipheo.com/services/testimonial-videos/"],
-                  ["Educational Videos", "https://epipheo.com/services/educational-videos/"],
-                  ["Trade Show Videos", "https://epipheo.com/services/trade-show-videos/"],
+                  ["Explainer Videos", "https://epipheo.com/services/premium-explainer-video/"],
+                  ["3D Explainer Videos", "https://epipheo.com/services/3d-explainer-video/"],
+                  ["Testimonial Videos", "https://epipheo.com/services/storytelling-testimonial-video/"],
+                  ["Educational Videos", "https://epipheo.com/services/educational-video-series/"],
+                  ["Trade Show Videos", "https://epipheo.com/services/trade-show-video/"],
                 ].map(([label, href]) => (
                   <li key={label}>
                     <a
@@ -588,10 +626,9 @@ export default function EnterpriseExplainer() {
               <ul className="space-y-4 text-gray-400 text-sm">
                 {[
                   ["About Us", "https://epipheo.com/about/"],
-                  ["Portfolio", "https://epipheo.com/portfolio/"],
+                  ["Portfolio", "https://epipheo.com/epipheo-portfolio/"],
                   ["Careers", "https://epipheo.com/careers/"],
-                  ["Contact", "https://epipheo.com/contact/"],
-                  ["Blog", "https://epipheo.com/blog/"],
+                  ["Blog", "https://epipheo.com/learn/"],
                 ].map(([label, href]) => (
                   <li key={label}>
                     <a
@@ -617,10 +654,10 @@ export default function EnterpriseExplainer() {
               </h5>
               <ul className="space-y-4 text-gray-400 text-sm">
                 {[
-                  ["B2B Software", "https://epipheo.com/industries/b2b-software/"],
-                  ["Healthcare", "https://epipheo.com/industries/healthcare/"],
-                  ["Finance", "https://epipheo.com/industries/finance/"],
-                  ["Non-Profit", "https://epipheo.com/industries/non-profit/"],
+                  ["B2B", "https://epipheo.com/b2b/"],
+                  ["B2C", "https://epipheo.com/b2c/"],
+                  ["Non-Profit", "https://epipheo.com/non-profit/"],
+                  ["All Industries", "https://epipheo.com/industry/"],
                 ].map(([label, href]) => (
                   <li key={label}>
                     <a
@@ -638,25 +675,7 @@ export default function EnterpriseExplainer() {
           </div>
 
           <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-gray-600 uppercase tracking-widest">
-            <p>© 2026 Epipheo. All Rights Reserved.</p>
-            <div className="flex gap-8">
-              <a
-                href="https://epipheo.com/privacy-policy/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="https://epipheo.com/terms-of-service/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors"
-              >
-                Terms of Service
-              </a>
-            </div>
+            <p>&copy; 2026 Epipheo. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
