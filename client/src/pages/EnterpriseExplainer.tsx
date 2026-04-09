@@ -333,8 +333,8 @@ export default function EnterpriseExplainer() {
                   src={logo.src}
                   alt={logo.name}
                   style={{
-                    maxHeight: "36px",
-                    maxWidth: "120px",
+                    maxHeight: "44px",
+                    maxWidth: "160px",
                     objectFit: "contain",
                     filter: "grayscale(100%) opacity(0.5)",
                   }}
