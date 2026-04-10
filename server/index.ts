@@ -1,3 +1,4 @@
+import compression from "compression";
 import express from "express";
 import { createServer } from "http";
 import path from "path";
@@ -9,6 +10,9 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  // Gzip/Brotli compression
+  app.use(compression());
 
   // Security headers
   app.use((_req, res, next) => {
