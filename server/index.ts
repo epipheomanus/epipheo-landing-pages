@@ -11,7 +11,7 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Gzip/Brotli compression
+  // Gzip/Brotli compression for all responses
   app.use(compression());
 
   // Security headers
@@ -23,37 +23,43 @@ async function startServer() {
     next();
   });
 
-  // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
       : path.resolve(__dirname, "..", "dist", "public");
 
-  // Static assets with long cache (hashed filenames)
+  // Hashed static assets — aggressive immutable cache (1 year)
   app.use(
     "/assets",
     express.static(path.join(staticPath, "assets"), {
-      maxAge: "1y",
+      maxAge: "365d",
       immutable: true,
+      etag: false,
+      lastModified: false,
     })
   );
 
-  // Other static files with shorter cache
+  // Other static files (favicon, logos) — moderate cache
   app.use(
     express.static(staticPath, {
       maxAge: "1h",
+      index: false, // Don't auto-serve index.html from static middleware
     })
   );
 
-  // Handle client-side routing - serve index.html for all routes
+  // SPA fallback: serve index.html for ALL routes with no-cache
+  // This ensures query strings (UTM params, gclid, etc.) never cause issues
   app.get("*", (_req, res) => {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
   const port = process.env.PORT || 3000;
 
   server.listen(port, () => {
-    console.log(`Epipheo Quokka Landing — running on http://localhost:${port}/`);
+    console.log(`Epipheo Landing Pages — running on http://localhost:${port}/`);
   });
 }
 
