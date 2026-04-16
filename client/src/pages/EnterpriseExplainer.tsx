@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useInView } from "@/hooks/useInView";
 
 /* ─── Portfolio Videos ────────────────────────────────────────────────────── */
@@ -13,12 +13,12 @@ const PORTFOLIO_VIDEOS = [
 
 /* ─── Client Logos ────────────────────────────────────────────────────────── */
 const CLIENT_LOGOS = [
-  { name: "Google", src: "/logos/google.png", invert: false },
-  { name: "Amazon", src: "/logos/amazon.png", invert: false },
-  { name: "P&G", src: "/logos/pg.png", invert: false },
-  { name: "Deloitte", src: "/logos/deloitte.png", invert: false },
-  { name: "Splunk", src: "/logos/splunk.png", invert: true },
-  { name: "Okta", src: "/logos/okta.png", invert: true },
+  { name: "Google", src: "/logos/google.webp", fallback: "/logos/google.png", invert: false },
+  { name: "Amazon", src: "/logos/amazon.webp", fallback: "/logos/amazon.png", invert: false },
+  { name: "P&G", src: "/logos/pg.webp", fallback: "/logos/pg.png", invert: false },
+  { name: "Deloitte", src: "/logos/deloitte.webp", fallback: "/logos/deloitte.png", invert: false },
+  { name: "Splunk", src: "/logos/splunk.webp", fallback: "/logos/splunk.png", invert: true },
+  { name: "Okta", src: "/logos/okta.webp", fallback: "/logos/okta.png", invert: true },
 ];
 
 /* ─── Testimonials ────────────────────────────────────────────────────────── */
@@ -216,28 +216,78 @@ function FaqItem({ item }: { item: (typeof FAQ_ITEMS)[0] }) {
   );
 }
 
-/* ─── Wistia Video Component ──────────────────────────────────────────────── */
-function WistiaVideo({ id }: { id: string }) {
-  useEffect(() => {
-    const jsonpSrc = `https://fast.wistia.com/embed/medias/${id}.jsonp`;
-    if (!document.querySelector(`script[src="${jsonpSrc}"]`)) {
-      const s1 = document.createElement("script");
-      s1.src = jsonpSrc;
-      s1.async = true;
-      document.head.appendChild(s1);
-    }
+/* ─── Wistia SDK Loader (singleton) ─────────────────────────────────────── */
+let wistiaSDKLoaded = false;
+let wistiaSDKPromise: Promise<void> | null = null;
+
+function loadWistiaSDK(): Promise<void> {
+  if (wistiaSDKLoaded) return Promise.resolve();
+  if (wistiaSDKPromise) return wistiaSDKPromise;
+
+  wistiaSDKPromise = new Promise((resolve) => {
     const evSrc = "https://fast.wistia.com/assets/external/E-v1.js";
     if (!document.querySelector(`script[src="${evSrc}"]`)) {
-      const s2 = document.createElement("script");
-      s2.src = evSrc;
-      s2.async = true;
-      document.head.appendChild(s2);
+      const s = document.createElement("script");
+      s.src = evSrc;
+      s.async = true;
+      s.onload = () => {
+        wistiaSDKLoaded = true;
+        resolve();
+      };
+      document.head.appendChild(s);
+    } else {
+      wistiaSDKLoaded = true;
+      resolve();
     }
-  }, [id]);
+  });
+  return wistiaSDKPromise;
+}
+
+function loadWistiaMedia(id: string) {
+  const jsonpSrc = `https://fast.wistia.com/embed/medias/${id}.jsonp`;
+  if (!document.querySelector(`script[src="${jsonpSrc}"]`)) {
+    const s = document.createElement("script");
+    s.src = jsonpSrc;
+    s.async = true;
+    document.head.appendChild(s);
+  }
+}
+
+/* ─── Wistia Video Facade (lazy load on click or viewport for hero) ──────── */
+function WistiaVideo({ id, eager = false }: { id: string; eager?: boolean }) {
+  const [activated, setActivated] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // For the hero video, load when it enters viewport
+  const { ref: viewRef, inView } = useInView(0.1);
+
+  useEffect(() => {
+    if (eager && inView && !activated) {
+      setActivated(true);
+    }
+  }, [eager, inView, activated]);
+
+  useEffect(() => {
+    if (!activated) return;
+    loadWistiaSDK();
+    loadWistiaMedia(id);
+  }, [activated, id]);
+
+  const handleClick = useCallback(() => {
+    if (!activated) setActivated(true);
+  }, [activated]);
+
+  // Wistia thumbnail URL
+  const thumbUrl = `https://fast.wistia.com/embed/medias/${id}/swatch`;
 
   return (
-    <div style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+    <div
+      ref={viewRef}
+      style={{ padding: "56.25% 0 0 0", position: "relative", cursor: activated ? "default" : "pointer" }}
+      onClick={handleClick}
+    >
       <div
+        ref={containerRef}
         style={{
           height: "100%",
           left: 0,
@@ -246,20 +296,91 @@ function WistiaVideo({ id }: { id: string }) {
           width: "100%",
         }}
       >
-        <div
-          className={`wistia_embed wistia_async_${id} seo=true videoFoam=true`}
-          style={{ height: "100%", position: "relative", width: "100%" }}
-        >
-          &nbsp;
-        </div>
+        {activated ? (
+          <div
+            className={`wistia_embed wistia_async_${id} seo=true videoFoam=true`}
+            style={{ height: "100%", position: "relative", width: "100%" }}
+          >
+            &nbsp;
+          </div>
+        ) : (
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              position: "relative",
+              background: "#000",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {/* Thumbnail swatch */}
+            <img
+              src={thumbUrl}
+              alt="Video thumbnail"
+              loading={eager ? "eager" : "lazy"}
+              decoding="async"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "brightness(0.7)",
+              }}
+            />
+            {/* Play button overlay */}
+            <div
+              style={{
+                position: "relative",
+                zIndex: 2,
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                background: "rgba(255, 95, 60, 0.9)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "transform 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            >
+              <svg width="28" height="32" viewBox="0 0 28 32" fill="white">
+                <path d="M0 0 L28 16 L0 32 Z" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-/* ─── HubSpot Form + Budget Dropdown ─────────────────────────────────────── */
+/* ─── HubSpot Form + Budget Dropdown (deferred loading) ─────────────────── */
 function QuoteForm() {
+  const formContainerRef = useRef<HTMLDivElement>(null);
+  const formLoaded = useRef(false);
+  const { ref: sectionRef, inView } = useInView(0.1);
+
   useEffect(() => {
+    if (!inView || formLoaded.current) return;
+
+    const loadForm = () => {
+      if ((window as any).hbspt && formContainerRef.current) {
+        formLoaded.current = true;
+        (window as any).hbspt.forms.create({
+          region: "na1",
+          portalId: "20864859",
+          formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
+          target: "#hs-form-target",
+        });
+        return true;
+      }
+      return false;
+    };
+
     const src = "//js.hsforms.net/forms/embed/v2.js";
     if (!document.querySelector(`script[src="${src}"]`)) {
       const script = document.createElement("script");
@@ -267,28 +388,29 @@ function QuoteForm() {
       script.charset = "utf-8";
       script.type = "text/javascript";
       script.onload = () => {
-        if ((window as any).hbspt) {
-          (window as any).hbspt.forms.create({
-            region: "na1",
-            portalId: "20864859",
-            formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
-            target: "#hs-form-target",
-          });
+        loadForm();
+        if (!formLoaded.current) {
+          const interval = setInterval(() => {
+            if (loadForm()) clearInterval(interval);
+          }, 300);
+          // Safety: stop trying after 10s
+          setTimeout(() => clearInterval(interval), 10000);
         }
       };
       document.body.appendChild(script);
-    } else if ((window as any).hbspt) {
-      (window as any).hbspt.forms.create({
-        region: "na1",
-        portalId: "20864859",
-        formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
-        target: "#hs-form-target",
-      });
+    } else {
+      loadForm();
+      if (!formLoaded.current) {
+        const interval = setInterval(() => {
+          if (loadForm()) clearInterval(interval);
+        }, 300);
+        setTimeout(() => clearInterval(interval), 10000);
+      }
     }
-  }, []);
+  }, [inView]);
 
   return (
-    <div>
+    <div ref={sectionRef}>
       {/* Budget dropdown — above HubSpot form */}
       <div style={{ marginBottom: "20px" }}>
         <label
@@ -312,7 +434,7 @@ function QuoteForm() {
       </div>
 
       {/* HubSpot form */}
-      <div id="hs-form-target" />
+      <div id="hs-form-target" ref={formContainerRef} />
 
       {/* Style overrides for HubSpot form on dark background */}
       <style>{`
@@ -428,9 +550,14 @@ export default function EnterpriseExplainer() {
             rel="noopener noreferrer"
           >
             <img
-              src="/logos/epipheo-white-cropped.png"
+              src="/logos/epipheo-white-cropped.webp"
               alt="Epipheo"
               className="h-10 w-auto"
+              width="68"
+              height="40"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/logos/epipheo-white-cropped.png";
+              }}
             />
           </a>
           <button
@@ -482,7 +609,7 @@ export default function EnterpriseExplainer() {
 
             <FadeIn delay={0.2}>
               <div className="rounded-lg overflow-hidden shadow-2xl">
-                <WistiaVideo id="l8418oscmu" />
+                <WistiaVideo id="l8418oscmu" eager />
               </div>
             </FadeIn>
           </div>
@@ -508,6 +635,10 @@ export default function EnterpriseExplainer() {
                 <img
                   src={logo.src}
                   alt={logo.name}
+                  loading="lazy"
+                  decoding="async"
+                  width="130"
+                  height="38"
                   className="transition-opacity duration-300 hover:opacity-90"
                   style={{
                     maxHeight: "38px",
@@ -517,6 +648,9 @@ export default function EnterpriseExplainer() {
                     filter: logo.invert
                       ? "brightness(0) invert(1) grayscale(100%)"
                       : "grayscale(100%)",
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = logo.fallback;
                   }}
                 />
               </div>
@@ -1019,9 +1153,15 @@ export default function EnterpriseExplainer() {
                 rel="noopener noreferrer"
               >
                 <img
-                  src="/logos/epipheo-white-cropped.png"
+                  src="/logos/epipheo-white-cropped.webp"
                   alt="Epipheo"
                   className="h-10 w-auto mb-8"
+                  width="68"
+                  height="40"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/logos/epipheo-white-cropped.png";
+                  }}
                 />
               </a>
               <div className="text-gray-400 space-y-2 mb-8 text-sm">
