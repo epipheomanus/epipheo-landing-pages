@@ -9,6 +9,9 @@
     <link rel="icon" href="/favicon.webp" sizes="192x192" />
     <link rel="apple-touch-icon" href="/favicon.webp" />
 
+    <!-- Preload hero video thumbnail (LCP element) -->
+    <link rel="preload" as="image" type="image/webp" href="/hero-thumb.webp" fetchpriority="high" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Epipheo" />
@@ -34,12 +37,12 @@
     }
     </script>
 
-    <!-- Google Tag Manager (async, non-blocking) -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    <!-- Google Tag Manager (deferred 3s — conversions only happen after user interaction) -->
+    <script>setTimeout(function(){(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NMC263K');</script>
+    })(window,document,'script','dataLayer','GTM-NMC263K');},3000);</script>
 
     <!-- Google Fonts: only families actually used, with display=swap and preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

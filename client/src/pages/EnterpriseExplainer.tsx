@@ -253,20 +253,12 @@ function loadWistiaMedia(id: string) {
   }
 }
 
-/* ─── Wistia Video Facade (lazy load on click or viewport for hero) ──────── */
-function WistiaVideo({ id, eager = false }: { id: string; eager?: boolean }) {
+/* ─── Wistia Video Facade (ALL videos click-to-load, zero Wistia JS on initial paint) */
+function WistiaVideo({ id, isHero = false }: { id: string; isHero?: boolean }) {
   const [activated, setActivated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // For the hero video, load when it enters viewport
-  const { ref: viewRef, inView } = useInView(0.1);
-
-  useEffect(() => {
-    if (eager && inView && !activated) {
-      setActivated(true);
-    }
-  }, [eager, inView, activated]);
-
+  // Only load Wistia SDK + media AFTER user clicks play
   useEffect(() => {
     if (!activated) return;
     loadWistiaSDK();
@@ -277,12 +269,13 @@ function WistiaVideo({ id, eager = false }: { id: string; eager?: boolean }) {
     if (!activated) setActivated(true);
   }, [activated]);
 
-  // Wistia thumbnail URL
-  const thumbUrl = `https://fast.wistia.com/embed/medias/${id}/swatch`;
+  // Hero uses self-hosted thumbnail; others use Wistia swatch
+  const thumbUrl = isHero
+    ? "/hero-thumb.webp"
+    : `https://fast.wistia.com/embed/medias/${id}/swatch`;
 
   return (
     <div
-      ref={viewRef}
       style={{ padding: "56.25% 0 0 0", position: "relative", cursor: activated ? "default" : "pointer" }}
       onClick={handleClick}
     >
@@ -298,7 +291,7 @@ function WistiaVideo({ id, eager = false }: { id: string; eager?: boolean }) {
       >
         {activated ? (
           <div
-            className={`wistia_embed wistia_async_${id} seo=true videoFoam=true`}
+            className={`wistia_embed wistia_async_${id} seo=true videoFoam=true autoPlay=true`}
             style={{ height: "100%", position: "relative", width: "100%" }}
           >
             &nbsp;
@@ -315,12 +308,15 @@ function WistiaVideo({ id, eager = false }: { id: string; eager?: boolean }) {
               justifyContent: "center",
             }}
           >
-            {/* Thumbnail swatch */}
+            {/* Thumbnail */}
             <img
               src={thumbUrl}
               alt="Video thumbnail"
-              loading={eager ? "eager" : "lazy"}
-              decoding="async"
+              width="1280"
+              height="720"
+              loading={isHero ? "eager" : "lazy"}
+              decoding={isHero ? "sync" : "async"}
+              {...(isHero ? { fetchPriority: "high" } as any : {})}
               style={{
                 position: "absolute",
                 inset: 0,
@@ -609,7 +605,7 @@ export default function EnterpriseExplainer() {
 
             <FadeIn delay={0.2}>
               <div className="rounded-lg overflow-hidden shadow-2xl">
-                <WistiaVideo id="l8418oscmu" eager />
+                <WistiaVideo id="l8418oscmu" isHero />
               </div>
             </FadeIn>
           </div>
