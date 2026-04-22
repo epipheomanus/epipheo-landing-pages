@@ -288,7 +288,7 @@ function closeModal() {
 // ============================================================
 // CTA BUTTON INTERCEPTION
 // Targets:
-//   - [data-scroll-chat] buttons (mid-cta, final CTA, footer) → scroll to top
+//   - [data-scroll-chat] buttons (mid-cta, final CTA, footer) → scroll to #chat
 //   - .btn-ghost.get-a-quote-btn (new nav button) → open modal
 //   - .btn-primary in .nav-actions (existing nav CTA) → open modal
 //   - Any element whose text contains "Scope My Project" or "Get a Quote" → open modal
@@ -474,9 +474,9 @@ async function ensureSession() {
       onError:        handleError,
       clientTools: {
         show_contact_form: () => {
-          // 2s delay so the agent's spoken line finishes before the modal pops.
+          // 3s delay so the agent's spoken line finishes before the modal pops.
           // Direct CTA clicks still call openModal() synchronously — no delay there.
-          setTimeout(openModal, 2000);
+          setTimeout(openModal, 3000);
           return 'Contact form opening';
         },
       },
