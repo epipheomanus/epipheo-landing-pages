@@ -70,36 +70,52 @@ const HS_PORTAL_ID = '20864859';
 const HS_FORM_ID   = 'e5f5b509-ffe1-46c3-8825-1154264756f7';
 const HS_REGION    = 'na1';
 
-let hsScriptLoaded   = false;
-let hsScriptLoading  = false;
-let modalEl          = null;
-
 // Holds the submitter's email captured in onFormSubmit (pre-submit)
 var pendingSubmitEmail = '';
 
+// ---- loadHsScript ----
+// Uses window.__ flags so concurrent script executions share state
+// and the HubSpot embed script is only injected once.
 function loadHsScript() {
   return new Promise((resolve) => {
-    if (hsScriptLoaded) { resolve(); return; }
-    if (hsScriptLoading) {
-      // Poll until loaded
+    if (window.__hsScriptLoaded) { resolve(); return; }
+    if (window.__hsScriptLoading) {
       const poll = setInterval(() => {
-        if (hsScriptLoaded) { clearInterval(poll); resolve(); }
+        if (window.__hsScriptLoaded) { clearInterval(poll); resolve(); }
       }, 80);
       return;
     }
-    hsScriptLoading = true;
+    // If WP Rocket (or another plugin) already injected the script,
+    // just wait for hbspt to become available instead of adding a second copy.
+    const existing = document.querySelector('script[src*="js.hsforms.net/forms/embed/v2.js"]');
+    if (existing) {
+      const waitForHbspt = setInterval(() => {
+        if (window.hbspt) { clearInterval(waitForHbspt); window.__hsScriptLoaded = true; resolve(); }
+      }, 80);
+      return;
+    }
+    window.__hsScriptLoading = true;
     const s = document.createElement('script');
     s.src = '//js.hsforms.net/forms/embed/v2.js';
     s.charset = 'utf-8';
     s.type = 'text/javascript'; // plain script so WP Rocket does NOT rewrite it
-    s.onload = () => { hsScriptLoaded = true; resolve(); };
-    s.onerror = () => { hsScriptLoading = false; resolve(); }; // resolve anyway, form will fail gracefully
+    s.onload = () => { window.__hsScriptLoaded = true; resolve(); };
+    s.onerror = () => { window.__hsScriptLoading = false; resolve(); }; // resolve anyway, form will fail gracefully
     document.head.appendChild(s);
   });
 }
 
+// ---- buildModal ----
+// DOM-based singleton: if the overlay already exists in the DOM, return it
+// (and prune any extra copies from a double-execution). Never creates two modals.
 function buildModal() {
-  if (modalEl) return modalEl;
+  const existing = document.getElementById('hs-quote-modal');
+  if (existing) {
+    // Remove any extra copies produced by a double-execution of this script
+    const all = document.querySelectorAll('#hs-quote-modal');
+    if (all.length > 1) { for (let i = 1; i < all.length; i++) all[i].remove(); }
+    return existing;
+  }
 
   const overlay = document.createElement('div');
   overlay.id = 'hs-quote-modal';
@@ -119,7 +135,6 @@ function buildModal() {
   `;
 
   document.body.appendChild(overlay);
-  modalEl = overlay;
 
   // Close on backdrop click
   overlay.addEventListener('click', (e) => {
@@ -130,25 +145,35 @@ function buildModal() {
   document.getElementById('hs-modal-close').addEventListener('click', closeModal);
 
   // Close on Escape — scoped to check our own open state so it does NOT
-  // interfere with the video lightbox's Escape handler
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeModal();
-  });
+  // interfere with the video lightbox's Escape handler.
+  // Guarded with window.__hsEscBound so only one listener is ever attached.
+  if (!window.__hsEscBound) {
+    window.__hsEscBound = true;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const m = document.getElementById('hs-quote-modal');
+        if (m && m.classList.contains('is-open')) closeModal();
+      }
+    });
+  }
 
   return overlay;
 }
-
-let hsFormRendered = false;
 
 async function openModal() {
   const modal = buildModal();
   modal.classList.add('is-open');
   document.body.style.overflow = 'hidden';
 
-  // Load HubSpot embed script and render form once
-  if (!hsFormRendered) {
+  // Load HubSpot embed script and render form once.
+  // window.__hsQuoteFormRendered is shared across all executions of this script,
+  // so even if the script runs twice the form is only created once.
+  const target = modal.querySelector('#hs-form-target');
+  const alreadyRendered = window.__hsQuoteFormRendered || (target && target.children.length > 0);
+  if (!alreadyRendered) {
+    window.__hsQuoteFormRendered = true;
     await loadHsScript();
-    if (window.hbspt && window.hbspt.forms) {
+    if (window.hbspt && window.hbspt.forms && target && target.children.length === 0) {
       window.hbspt.forms.create({
         region:   HS_REGION,
         portalId: HS_PORTAL_ID,
@@ -244,7 +269,6 @@ async function openModal() {
           }
         }
       });
-      hsFormRendered = true;
     }
   }
 
@@ -255,8 +279,9 @@ async function openModal() {
 }
 
 function closeModal() {
-  if (!modalEl) return;
-  modalEl.classList.remove('is-open');
+  const modal = document.getElementById('hs-quote-modal');
+  if (!modal) return;
+  modal.classList.remove('is-open');
   document.body.style.overflow = '';
 }
 
@@ -327,21 +352,28 @@ function checkAnchorOpen() {
 // Run immediately if DOM is already ready (modules are deferred),
 // otherwise wait for DOMContentLoaded.
 function initModal() {
+  // Sweep for extra modal copies before binding CTAs (double-execution guard)
+  const dupes = document.querySelectorAll('#hs-quote-modal');
+  if (dupes.length > 1) { for (let i = 1; i < dupes.length; i++) dupes[i].remove(); }
   interceptCTAs();
   checkAnchorOpen();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initModal);
-} else {
-  // DOM already ready — run now
-  initModal();
+// window.__hsModalInited ensures initModal() only runs once even if this
+// script is loaded/executed more than once (WP Rocket, cache, etc.)
+if (!window.__hsModalInited) {
+  window.__hsModalInited = true;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModal);
+  } else {
+    // DOM already ready — run now
+    initModal();
+  }
+  // Also handle hash changes (e.g. SPA navigation or in-page links)
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#get-a-quote') openModal();
+  });
 }
-
-// Also handle hash changes (e.g. SPA navigation or in-page links)
-window.addEventListener('hashchange', () => {
-  if (window.location.hash === '#get-a-quote') openModal();
-});
 
 // ============================================================
 // MODE TOGGLE (Text / Voice)
