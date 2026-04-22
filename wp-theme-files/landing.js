@@ -288,18 +288,21 @@ function closeModal() {
 // ============================================================
 // CTA BUTTON INTERCEPTION
 // Targets:
-//   - [data-scroll-chat] buttons (mid-cta, final CTA, footer)
-//   - .btn-ghost.get-a-quote-btn (new nav button)
-//   - .btn-primary in .nav-actions (existing nav CTA)
-//   - Any element whose text contains "Scope My Project" or "Get a Quote"
+//   - [data-scroll-chat] buttons (mid-cta, final CTA, footer) → scroll to #chat
+//   - .btn-ghost.get-a-quote-btn (new nav button) → open modal
+//   - .btn-primary in .nav-actions (existing nav CTA) → open modal
+//   - Any element whose text contains "Scope My Project" or "Get a Quote" → open modal
 // ============================================================
 function interceptCTAs() {
-  // data-scroll-chat buttons — replace scroll behavior with modal
+  // data-scroll-chat buttons — smooth-scroll to the AI chat widget
   document.querySelectorAll('[data-scroll-chat]').forEach(el => {
     el.removeAttribute('data-scroll-chat');
     el.addEventListener('click', (e) => {
       e.preventDefault();
-      openModal();
+      const chatEl = document.getElementById('chat');
+      if (chatEl) {
+        chatEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
     el.dataset.hsCtaBound = '1';
   });
