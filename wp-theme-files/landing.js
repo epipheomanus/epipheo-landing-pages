@@ -472,6 +472,12 @@ async function ensureSession() {
       onStatusChange: handleStatusChange,
       onModeChange:   handleModeChange,
       onError:        handleError,
+      clientTools: {
+        show_contact_form: () => {
+          openModal();
+          return 'Contact form opened';
+        },
+      },
     };
     if (currentMode === 'text') {
       opts.textOnly = true;
