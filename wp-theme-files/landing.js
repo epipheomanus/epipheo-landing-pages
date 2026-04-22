@@ -35,6 +35,35 @@ let hasUserSentMsg   = false; // suppress agent greeting before first user msg
 let volumeRafId      = null;
 
 // ============================================================
+// CONVERSATION HISTORY (Feature 2: Eli transcript → HubSpot)
+// ============================================================
+var conversationHistory = [];
+var conversationId      = null;
+
+function recordMessage(role, text) {
+  conversationHistory.push({
+    role:      role,
+    text:      text,
+    timestamp: new Date().toISOString()
+  });
+}
+
+function formatTranscript() {
+  if (!conversationHistory.length) return '';
+  var lines = [];
+  if (conversationId) {
+    lines.push('ElevenLabs Conversation ID: ' + conversationId);
+    lines.push('');
+  }
+  conversationHistory.forEach(function(msg) {
+    var label = msg.role === 'user' ? 'User' : 'Eli (Agent)';
+    var time  = msg.timestamp ? ' [' + msg.timestamp + ']' : '';
+    lines.push(label + time + ': ' + msg.text);
+  });
+  return lines.join('\n');
+}
+
+// ============================================================
 // HUBSPOT QUOTE MODAL
 // ============================================================
 const HS_PORTAL_ID = '20864859';
@@ -44,6 +73,9 @@ const HS_REGION    = 'na1';
 let hsScriptLoaded   = false;
 let hsScriptLoading  = false;
 let modalEl          = null;
+
+// Holds the submitter's email captured in onFormSubmit (pre-submit)
+var pendingSubmitEmail = '';
 
 function loadHsScript() {
   return new Promise((resolve) => {
@@ -122,7 +154,55 @@ async function openModal() {
         portalId: HS_PORTAL_ID,
         formId:   HS_FORM_ID,
         target:   '#hs-form-target',
-        onFormSubmitted: () => {
+
+        // --------------------------------------------------------
+        // Feature 1: UTM Parameter Tracking
+        // Populate hidden UTM fields as soon as the form is ready
+        // --------------------------------------------------------
+        onFormReady: function($form) {
+          var params = new URLSearchParams(window.location.search);
+          var utmFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+          utmFields.forEach(function(field) {
+            var val = params.get(field);
+            if (val) {
+              var input = $form.find('input[name="' + field + '"]');
+              if (input && input.length) {
+                input.val(val).trigger('change');
+              } else {
+                // Field may not be visible in the form; set via a hidden input
+                var hidden = document.createElement('input');
+                hidden.type  = 'hidden';
+                hidden.name  = field;
+                hidden.value = val;
+                // $form[0] is the raw <form> element when HubSpot passes a jQuery-like object
+                var rawForm = ($form && $form[0]) ? $form[0] : $form;
+                if (rawForm && rawForm.appendChild) {
+                  rawForm.appendChild(hidden);
+                }
+              }
+            }
+          });
+        },
+
+        // --------------------------------------------------------
+        // Feature 2 (pre-submit): Capture email before submission
+        // --------------------------------------------------------
+        onFormSubmit: function($form) {
+          var rawForm = ($form && $form[0]) ? $form[0] : $form;
+          if (rawForm) {
+            var emailInput = rawForm.querySelector('input[name="email"]');
+            if (emailInput) {
+              pendingSubmitEmail = emailInput.value.trim();
+            }
+          }
+        },
+
+        // --------------------------------------------------------
+        // Feature 2 (post-submit): Send transcript to HubSpot
+        // + show success state
+        // --------------------------------------------------------
+        onFormSubmitted: function() {
+          // Show success message
           const target = document.getElementById('hs-form-target');
           if (target) {
             target.innerHTML = `
@@ -135,6 +215,32 @@ async function openModal() {
                 <p>We'll be in touch within one business day.</p>
               </div>
             `;
+          }
+
+          // Post transcript to HubSpot Forms v3 API (no private token needed)
+          var transcript = formatTranscript();
+          var email      = pendingSubmitEmail;
+          if (transcript && email) {
+            var payload = {
+              fields: [
+                { name: 'email',   value: email },
+                { name: 'message', value: transcript }
+              ],
+              context: {
+                pageUri:  window.location.href,
+                pageName: 'Explainer Video Pricing - Chat Transcript'
+              }
+            };
+            fetch(
+              'https://api.hsforms.com/submissions/v3/integration/submit/20864859/e5f5b509-ffe1-46c3-8825-1154264756f7',
+              {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(payload)
+              }
+            ).catch(function(err) {
+              console.warn('[HubSpot transcript] submission failed:', err);
+            });
           }
         }
       });
@@ -339,6 +445,13 @@ async function ensureSession() {
       opts.textOnly = true;
     }
     session = await Conversation.startSession(opts);
+
+    // Store the conversation ID for transcript attribution (Feature 2)
+    try {
+      conversationId = session.getId ? session.getId() : null;
+    } catch (_) {
+      conversationId = null;
+    }
   } catch (err) {
     session = null;
     dotState('error');
@@ -372,6 +485,10 @@ function flushAgentBuffer() {
   if (!agentMsgBuffer) return;
 
   const html = formatAgentMessage(agentMsgBuffer);
+
+  // Record the flushed agent message in conversation history (Feature 2)
+  recordMessage('agent', agentMsgBuffer);
+
   agentMsgBuffer = '';
 
   if (agentMsgEl && agentMsgEl.parentNode === msgStage) {
@@ -403,6 +520,8 @@ function handleMessage({ message, source }) {
     agentMsgDebounce = setTimeout(flushAgentBuffer, AGENT_MSG_DEBOUNCE_MS);
 
   } else if (source === 'user' && currentMode === 'voice') {
+    // Record voice user messages in conversation history (Feature 2)
+    recordMessage('user', message);
     addMsg(escHtml(message), 'user');
   }
 }
@@ -463,6 +582,9 @@ async function submitMessage() {
   agentMsgEl       = null;
 
   if (promptsEl) promptsEl.style.display = 'none';
+
+  // Record user text message in conversation history (Feature 2)
+  recordMessage('user', q);
 
   addMsg(escHtml(q), 'user');
   addTyping();
