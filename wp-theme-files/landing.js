@@ -477,8 +477,10 @@ async function ensureSession() {
       onError:        handleError,
       clientTools: {
         show_contact_form: () => {
-          openModal();
-          return 'Contact form opened';
+          // 2s delay so the agent's spoken line finishes before the modal pops.
+          // Direct CTA clicks still call openModal() synchronously — no delay there.
+          setTimeout(openModal, 2000);
+          return 'Contact form opening';
         },
       },
     };
