@@ -121,13 +121,13 @@ function buildModal() {
   overlay.id = 'hs-quote-modal';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Get a Quote');
+  overlay.setAttribute('aria-label', 'Let\'s Talk');
   overlay.innerHTML = `
     <div class="hs-modal-card" id="hs-modal-card">
       <button class="hs-modal-close" id="hs-modal-close" aria-label="Close">&times;</button>
       <div class="hs-modal-header">
         <p class="hs-modal-eyebrow">Free Scope Call</p>
-        <h2 class="hs-modal-title">Get a Quote</h2>
+        <h2 class="hs-modal-title">Let's Talk</h2>
         <p class="hs-modal-sub">Tell us about your project. We'll respond within one business day.</p>
       </div>
       <div id="hs-form-target"></div>
@@ -325,7 +325,7 @@ function interceptCTAs() {
   });
 
   // Catch-all: any button or anchor whose text matches CTA phrases
-  const ctaPhrases = /scope\s+my\s+project|get\s+a\s+quote/i;
+  const ctaPhrases = /scope\s+my\s+project|get\s+a\s+quote|let[’']?s\s+talk/i;
   document.querySelectorAll('a[href], button').forEach(el => {
     if (el.dataset.hsCtaBound) return;
     if (ctaPhrases.test(el.textContent)) {
