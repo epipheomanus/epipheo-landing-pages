@@ -77,7 +77,7 @@ $asset_base = esc_url( get_stylesheet_directory_uri() );
         <div class="msg-stage" id="msgStage">
           <div class="msg agent">
             <span class="who">Agent</span>
-            Let's scope your video. In a sentence or two - what's it for, who's it for, and roughly how long does it need to be? I'll ask a few follow-ups, then land on a range inside <span class="accent">+/-15%</span> of a real Epipheo quote.
+            Hey! I'm Epipheo's AI assistant. I can show you examples of our work, walk you through pricing and timelines, explain our production process, or help you scope out an actual project. What can I help with?
           </div>
         </div>
 
@@ -496,7 +496,6 @@ $asset_base = esc_url( get_stylesheet_directory_uri() );
     }
     playerContainer.innerHTML = '';
     lightbox.style.display = 'none';
-    document.body.style.overflow = '';
   }
 
   closeBtn.addEventListener('click', closeVideo);
