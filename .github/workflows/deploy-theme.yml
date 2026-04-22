@@ -46,32 +46,14 @@ jobs:
           put wp-theme-files/page-landing.php /wp-content/themes/minimo-child/page-landing.php
           EOF
 
-      - name: Verify uploaded file sizes on remote server
+      - name: Verify uploaded files on remote server
         env:
           SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
         run: |
-          echo "=== Verifying remote file sizes ==="
-          sshpass -e ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-            -p 2222 manus.ftp@epipheo.com@s21.wpxhosting.com \
-            "stat -c '%n %s bytes' \
-              /wp-content/themes/minimo-child/assets/js/landing.js \
-              /wp-content/themes/minimo-child/assets/css/landing.css \
-              /wp-content/themes/minimo-child/page-landing.php"
-
-      - name: Compare local vs remote file sizes
-        env:
-          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
-        run: |
-          echo "=== Local file sizes ==="
-          wc -c \
-            wp-theme-files/landing.js \
-            wp-theme-files/landing.css \
-            wp-theme-files/page-landing.php
-
-          echo "=== Remote file sizes ==="
-          sshpass -e ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-            -p 2222 manus.ftp@epipheo.com@s21.wpxhosting.com \
-            "wc -c \
-              /wp-content/themes/minimo-child/assets/js/landing.js \
-              /wp-content/themes/minimo-child/assets/css/landing.css \
-              /wp-content/themes/minimo-child/page-landing.php"
+          echo "=== Verifying remote files via SFTP ==="
+          sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 2222 \
+            manus.ftp@epipheo.com@s21.wpxhosting.com <<EOF
+          ls -la /wp-content/themes/minimo-child/assets/js/landing.js
+          ls -la /wp-content/themes/minimo-child/assets/css/landing.css
+          ls -la /wp-content/themes/minimo-child/page-landing.php
+          EOF
