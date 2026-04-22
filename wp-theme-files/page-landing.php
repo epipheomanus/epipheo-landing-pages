@@ -488,6 +488,7 @@ $asset_base = esc_url( get_stylesheet_directory_uri() );
   }
 
   function closeVideo() {
+    if (lightbox.style.display !== 'flex') return;
     if (currentVideo) {
       currentVideo.pause();
       currentVideo.remove();
@@ -503,7 +504,7 @@ $asset_base = esc_url( get_stylesheet_directory_uri() );
     if (e.target === lightbox) closeVideo();
   });
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeVideo();
+    if (e.key === 'Escape' && lightbox.style.display === 'flex') closeVideo();
   });
 
   document.querySelectorAll('.play-btn[data-video-id]').forEach(function(btn) {

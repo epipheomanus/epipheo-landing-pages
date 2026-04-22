@@ -33,7 +33,7 @@ body { margin: 0; background: #fff; color: #1A1A1A; font-family: 'Barlow', sans-
 }
 
 /* ---------- BUTTONS ---------- */
-.btn-primary, .btn-secondary, .btn-ghost {
+.btn-primary, .btn-secondary {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 13px;
   letter-spacing: .12em; text-transform: uppercase;
@@ -46,8 +46,31 @@ body { margin: 0; background: #fff; color: #1A1A1A; font-family: 'Barlow', sans-
 .btn-primary:active { transform: translateY(1px); }
 .btn-secondary { background: transparent; color: #1A1A1A; border-color: #1A1A1A; }
 .btn-secondary:hover { background: #1A1A1A; color: #fff; }
-.btn-ghost { background: transparent; color: #1A1A1A; padding: 12px 4px; border: 0; }
-.btn-ghost:hover { color: #FF6340; }
+
+/* Ghost button — outlined "Get a Quote" style */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 2px solid #FF5F3C;
+  color: #FF5F3C;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-ghost:hover {
+  background: #FF5F3C;
+  color: #fff;
+}
 
 /* ---------- LAYOUT ---------- */
 .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
@@ -714,10 +737,10 @@ footer ul a:hover { color: #fff; }
 }
 
 /* ==================== HIDE WP_FOOTER INJECTED CONTENT ==================== */
-body.epipheo-landing > *:not(.topnav):not(.hero):not(section):not(.clients):not(.why-wrap):not(.drivers):not(.mid-cta):not(.cta-section):not(footer):not(script):not(link):not(style):not(noscript) {
+body.epipheo-landing > *:not(.topnav):not(.hero):not(section):not(.clients):not(.why-wrap):not(.drivers):not(.mid-cta):not(.cta-section):not(footer):not(script):not(link):not(style):not(noscript):not(#hs-quote-modal):not(#video-lightbox) {
   display: none !important;
 }
-body.epipheo-landing footer ~ * {
+body.epipheo-landing footer ~ *:not(#hs-quote-modal):not(#video-lightbox) {
   display: none !important;
 }
 
@@ -759,16 +782,16 @@ body.epipheo-landing footer ~ * {
 
 /* ==================== HUBSPOT QUOTE MODAL ==================== */
 
-/* Overlay backdrop */
+/* Overlay backdrop — z-index 99998 sits one below video-lightbox (99999) */
 #hs-quote-modal {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.72);
+  z-index: 99998;
+  background: rgba(0, 0, 0, 0.55);
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 1rem;
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
 }
@@ -780,6 +803,7 @@ body.epipheo-landing footer ~ * {
 .hs-modal-card {
   position: relative;
   background: #fff;
+  color: #1A1A1A;
   border: 1px solid #F0F0F0;
   border-radius: 12px;
   width: 100%;
@@ -788,6 +812,7 @@ body.epipheo-landing footer ~ * {
   overflow-y: auto;
   padding: 48px 44px 44px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 95, 60, 0.12);
+  font-family: 'Barlow', sans-serif;
   animation: hs-modal-in 0.22s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 @keyframes hs-modal-in {
@@ -810,7 +835,7 @@ body.epipheo-landing footer ~ * {
   transition: color 0.15s;
   font-family: 'Barlow', sans-serif;
 }
-.hs-modal-close:hover { color: #1A1A1A; }
+.hs-modal-close:hover { color: #FF5F3C; }
 
 /* Modal header */
 .hs-modal-header { margin-bottom: 28px; }

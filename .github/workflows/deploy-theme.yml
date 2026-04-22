@@ -1,0 +1,77 @@
+name: Deploy WP Theme Files
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'wp-theme-files/**'
+
+jobs:
+  deploy:
+    name: SFTP Deploy to WPX Hosting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy landing.js
+        env:
+          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
+        run: |
+          sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 2222 \
+            manus.ftp@epipheo.com@s21.wpxhosting.com <<EOF
+          put wp-theme-files/landing.js /wp-content/themes/minimo-child/assets/js/landing.js
+          EOF
+
+      - name: Deploy landing.css
+        env:
+          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
+        run: |
+          sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 2222 \
+            manus.ftp@epipheo.com@s21.wpxhosting.com <<EOF
+          put wp-theme-files/landing.css /wp-content/themes/minimo-child/assets/css/landing.css
+          EOF
+
+      - name: Deploy page-landing.php
+        env:
+          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
+        run: |
+          sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 2222 \
+            manus.ftp@epipheo.com@s21.wpxhosting.com <<EOF
+          put wp-theme-files/page-landing.php /wp-content/themes/minimo-child/page-landing.php
+          EOF
+
+      - name: Verify uploaded file sizes on remote server
+        env:
+          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
+        run: |
+          echo "=== Verifying remote file sizes ==="
+          sshpass -e ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -p 2222 manus.ftp@epipheo.com@s21.wpxhosting.com \
+            "stat -c '%n %s bytes' \
+              /wp-content/themes/minimo-child/assets/js/landing.js \
+              /wp-content/themes/minimo-child/assets/css/landing.css \
+              /wp-content/themes/minimo-child/page-landing.php"
+
+      - name: Compare local vs remote file sizes
+        env:
+          SSHPASS: ${{ secrets.WPX_SFTP_PASSWORD }}
+        run: |
+          echo "=== Local file sizes ==="
+          wc -c \
+            wp-theme-files/landing.js \
+            wp-theme-files/landing.css \
+            wp-theme-files/page-landing.php
+
+          echo "=== Remote file sizes ==="
+          sshpass -e ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -p 2222 manus.ftp@epipheo.com@s21.wpxhosting.com \
+            "wc -c \
+              /wp-content/themes/minimo-child/assets/js/landing.js \
+              /wp-content/themes/minimo-child/assets/css/landing.css \
+              /wp-content/themes/minimo-child/page-landing.php"

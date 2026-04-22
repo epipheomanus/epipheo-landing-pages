@@ -59,7 +59,7 @@ function loadHsScript() {
     const s = document.createElement('script');
     s.src = '//js.hsforms.net/forms/embed/v2.js';
     s.charset = 'utf-8';
-    s.type = 'text/javascript';
+    s.type = 'text/javascript'; // plain script so WP Rocket does NOT rewrite it
     s.onload = () => { hsScriptLoaded = true; resolve(); };
     s.onerror = () => { hsScriptLoading = false; resolve(); }; // resolve anyway, form will fail gracefully
     document.head.appendChild(s);
@@ -97,7 +97,8 @@ function buildModal() {
   // Close button
   document.getElementById('hs-modal-close').addEventListener('click', closeModal);
 
-  // Close on Escape
+  // Close on Escape — scoped to check our own open state so it does NOT
+  // interfere with the video lightbox's Escape handler
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeModal();
   });
@@ -157,7 +158,8 @@ function closeModal() {
 // CTA BUTTON INTERCEPTION
 // Targets:
 //   - [data-scroll-chat] buttons (mid-cta, final CTA, footer)
-//   - .btn-primary in .nav-actions (nav CTA)
+//   - .btn-ghost.get-a-quote-btn (new nav button)
+//   - .btn-primary in .nav-actions (existing nav CTA)
 //   - Any element whose text contains "Scope My Project" or "Get a Quote"
 // ============================================================
 function interceptCTAs() {
@@ -168,24 +170,39 @@ function interceptCTAs() {
       e.preventDefault();
       openModal();
     });
+    el.dataset.hsCtaBound = '1';
   });
 
-  // Nav CTA button (.nav-actions .btn-primary)
-  document.querySelectorAll('.nav-actions .btn-primary').forEach(el => {
+  // Explicit "Get a Quote" ghost button in nav
+  document.querySelectorAll('.get-a-quote-btn').forEach(el => {
+    if (el.dataset.hsCtaBound) return;
     el.addEventListener('click', (e) => {
       e.preventDefault();
       openModal();
     });
+    el.dataset.hsCtaBound = '1';
+  });
+
+  // Nav CTA button (.nav-actions .btn-primary) — also routes to modal
+  document.querySelectorAll('.nav-actions .btn-primary').forEach(el => {
+    if (el.dataset.hsCtaBound) return;
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal();
+    });
+    el.dataset.hsCtaBound = '1';
   });
 
   // Catch-all: any button or anchor whose text matches CTA phrases
   const ctaPhrases = /scope\s+my\s+project|get\s+a\s+quote/i;
   document.querySelectorAll('a[href], button').forEach(el => {
+    if (el.dataset.hsCtaBound) return;
     if (ctaPhrases.test(el.textContent)) {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         openModal();
       });
+      el.dataset.hsCtaBound = '1';
     }
   });
 }
@@ -219,21 +236,6 @@ if (document.readyState === 'loading') {
 window.addEventListener('hashchange', () => {
   if (window.location.hash === '#get-a-quote') openModal();
 });
-
-// ============================================================
-// SCROLL-TO-CHAT CTAs — fallback for any [data-scroll-chat] buttons
-// not already intercepted by the modal code above
-// ============================================================
-setTimeout(() => {
-  document.querySelectorAll('[data-scroll-chat]').forEach(el => {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-      const y = chatFrame.getBoundingClientRect().top + window.pageYOffset - 80;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-      setTimeout(() => chatInput?.focus({ preventScroll: true }), 700);
-    });
-  });
-}, 100);
 
 // ============================================================
 // MODE TOGGLE (Text / Voice)
@@ -731,6 +733,8 @@ document.addEventListener('click', e => {
 
 // ============================================================
 // VIDEO LIGHTBOX (same pattern as page-landing.php)
+// Escape handler is guarded so it does NOT fire when the HS quote modal
+// is open (which would otherwise clobber body.overflow).
 // ============================================================
 (function() {
   // Create lightbox DOM if it doesn't already exist
@@ -760,6 +764,10 @@ document.addEventListener('click', e => {
     document.head.appendChild(ws);
   }
 
+  function isLightboxOpen() {
+    return lightbox.style.display === 'flex';
+  }
+
   function openVideo(videoId) {
     playerContainer.innerHTML = '';
     var embed = document.createElement('div');
@@ -776,6 +784,7 @@ document.addEventListener('click', e => {
   }
 
   function closeVideo() {
+    if (!isLightboxOpen()) return;
     if (currentVideo) {
       currentVideo.pause();
       currentVideo.remove();
@@ -791,7 +800,7 @@ document.addEventListener('click', e => {
     if (e.target === lightbox) closeVideo();
   });
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeVideo();
+    if (e.key === 'Escape' && isLightboxOpen()) closeVideo();
   });
 
   // Delegate clicks on video cards (they're dynamically created)
