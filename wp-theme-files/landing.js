@@ -990,6 +990,13 @@ const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 // ============================================================
-// PRE-WARM SESSION
+// PRE-WARM SDK (load the module so it's cached, but don't open a session)
 // ============================================================
-setTimeout(() => { ensureSession(); }, 1500);
+setTimeout(() => {
+  if (!Conversation) {
+    const link = document.createElement('link');
+    link.rel = 'modulepreload';
+    link.href = 'https://esm.sh/@11labs/client';
+    document.head.appendChild(link);
+  }
+}, 1500);
