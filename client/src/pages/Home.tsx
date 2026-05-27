@@ -633,14 +633,33 @@ function CTA() {
       }
     };
 
-    // Try immediately, then retry with interval
-    loadForm();
-    if (!formLoaded.current) {
-      const interval = setInterval(() => {
+    // Load HubSpot forms script if not already present
+    const src = "//js.hsforms.net/forms/embed/v2.js";
+    if (!document.querySelector(`script[src="${src}"]`)) {
+      const script = document.createElement("script");
+      script.src = src;
+      script.charset = "utf-8";
+      script.type = "text/javascript";
+      script.onload = () => {
         loadForm();
-        if (formLoaded.current) clearInterval(interval);
-      }, 500);
-      return () => clearInterval(interval);
+        if (!formLoaded.current) {
+          const interval = setInterval(() => {
+            if (loadForm()) clearInterval(interval);
+          }, 300);
+          setTimeout(() => clearInterval(interval), 10000);
+        }
+      };
+      document.body.appendChild(script);
+    } else {
+      // Script already exists, try immediately then retry
+      loadForm();
+      if (!formLoaded.current) {
+        const interval = setInterval(() => {
+          loadForm();
+          if (formLoaded.current) clearInterval(interval);
+        }, 500);
+        return () => clearInterval(interval);
+      }
     }
   }, []);
 
