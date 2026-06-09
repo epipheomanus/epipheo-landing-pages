@@ -371,6 +371,14 @@ function QuoteForm() {
           portalId: "20864859",
           formId: "348b82c1-f306-4caa-9c13-9f8c6b1ec0ff",
           target: "#hs-form-target",
+          onFormSubmitted: function () {
+            // Fire Microsoft Ads UET conversion event for form submission
+            (window as any).uetq = (window as any).uetq || [];
+            (window as any).uetq.push("event", "form_submission", {
+              event_category: "lead",
+              event_label: "go.epipheo.com",
+            });
+          },
         });
         return true;
       }
